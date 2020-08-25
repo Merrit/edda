@@ -42,10 +42,11 @@ class _LibraryState extends State<Library> {
               icon: Icon(Icons.settings),
               onPressed: () async {
                 Navigator.pushNamed(context, SettingsScreen.id);
-                setState(() {
-                  // This setState is here so it will rebuild the Library with
-                  // the new library path after the settings screen is popped.
-                });
+                // This setState is here so it will rebuild the Library with
+                // the new library path after the settings screen is popped.
+                getBookTiles().then((value) => setState(() {
+                      bookTiles = value;
+                    }));
               }),
         ],
       ),

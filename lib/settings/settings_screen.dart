@@ -19,7 +19,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void initState() {
     checkLibraryPath().then((value) => setState(() {
-          libraryPath = value;
+          libraryPath = (value == null) ? libraryPath : value;
         }));
     super.initState();
   }

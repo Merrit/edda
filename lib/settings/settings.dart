@@ -13,9 +13,8 @@ class Settings {
       return libraryPath;
     } else {
       print('No saved path found.');
-      libraryPath = '/path/to/Books/';
+      return null;
     }
-    return libraryPath;
   }
 
   Future<void> setPreference({String key, dynamic value}) async {

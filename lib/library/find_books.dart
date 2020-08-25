@@ -12,12 +12,16 @@ class Books {
   Future<void> findBooks() async {
     var prefs = Settings();
     libraryPath = await prefs.checkLibraryPath();
-    Directory library = Directory(libraryPath);
-    List files = library.listSync();
-    files.forEach((element) {
-      String bookName = path.basenameWithoutExtension(element.toString());
-      bookFiles[bookName] = element;
-    });
+    if (libraryPath == null) {
+      print('No library path is set');
+    } else {
+      Directory library = Directory(libraryPath);
+      List files = library.listSync();
+      files.forEach((element) {
+        String bookName = path.basenameWithoutExtension(element.toString());
+        bookFiles[bookName] = element;
+      });
+    }
   }
 
   Future<void> buildBookTiles() async {
