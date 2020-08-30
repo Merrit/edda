@@ -30,6 +30,8 @@ dependencies:
   shared_preferences: ^0.5.10
   file_picker_cross: ^4.0.1
   file_picker: ^1.13.3
+  archive: ^2.0.13
+  xml: ^4.4.1
 
 dev_dependencies:
   flutter_test:

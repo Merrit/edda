@@ -1,4 +1,5 @@
 // Standard Library
+import 'package:edda/read_book/book_screen.dart';
 import 'package:flutter/material.dart';
 
 // Edda Packages
@@ -21,6 +22,7 @@ class MyApp extends StatelessWidget {
       routes: {
         LibraryScreen.id: (context) => LibraryScreen(),
         SettingsScreen.id: (context) => SettingsScreen(),
+        BookScreen.id: (context) => BookScreen(),
       },
       initialRoute: LibraryScreen.id,
       debugShowCheckedModeBanner: false,

@@ -1,6 +1,10 @@
 // Standard Library
 import 'dart:io';
+import 'package:edda/read_book/book_screen.dart';
 import 'package:flutter/material.dart';
+
+// Edda Packages
+import 'package:edda/read_book/book.dart';
 
 class CoverTile extends StatelessWidget {
   final String name;
@@ -16,8 +20,7 @@ class CoverTile extends StatelessWidget {
         Center(
           child: InkWell(
             onTap: () {
-              // var epub = File(file);
-              print(filePath);
+              Navigator.pushNamed(context, BookScreen.id, arguments: filePath);
             },
             child: Card(
               child: ClipRRect(
