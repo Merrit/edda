@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:path/path.dart' as path;
 import 'dart:io' show Platform;
 
-// Reader Packages
-import 'package:reader/settings/settings.dart';
+// Edda Packages
+import 'package:edda/settings/settings.dart';
 
 // Third Party Packages
 import 'package:file_picker/file_picker.dart';

@@ -1,4 +1,4 @@
-# reader
+# Edda
 
 A new Flutter project.
 

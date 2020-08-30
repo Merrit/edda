@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:reader/helpers/check_file_type.dart';
+import 'package:edda/helpers/check_file_type.dart';
 
 void main() {
   group('file with extension', () {

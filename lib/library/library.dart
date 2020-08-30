@@ -1,11 +1,11 @@
 import 'dart:io';
 import 'package:path/path.dart' as path;
-import 'package:reader/components/cover_tile.dart';
-import 'package:reader/helpers/check_file_type.dart';
+import 'package:edda/components/cover_tile.dart';
+import 'package:edda/helpers/check_file_type.dart';
+import 'package:edda/settings/settings.dart';
 
-import 'package:reader/settings/settings.dart';
-
-class Books {
+/// The main library view of the application.
+class Library {
   String libraryPath;
   List<CoverTile> coverTilesList = [];
   Map<String, dynamic> bookFiles = {}; // Map<name, filePath>

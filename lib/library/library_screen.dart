@@ -2,19 +2,19 @@
 import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 
-// Reader Packages
-import 'package:reader/components/cover_tile.dart';
-import 'package:reader/library/library.dart';
-import 'package:reader/settings/settings_screen.dart';
+// Edda Packages
+import 'package:edda/components/cover_tile.dart';
+import 'package:edda/library/library.dart';
+import 'package:edda/settings/settings_screen.dart';
 
-class Library extends StatefulWidget {
+class LibraryScreen extends StatefulWidget {
   static final String id = 'library_screen';
 
   @override
-  _LibraryState createState() => _LibraryState();
+  _LibraryScreenState createState() => _LibraryScreenState();
 }
 
-class _LibraryState extends State<Library> {
+class _LibraryScreenState extends State<LibraryScreen> {
   String libraryPath;
   List<CoverTile> bookTiles = [];
   // TODO: This spacing variable should probably replaced with
@@ -23,9 +23,9 @@ class _LibraryState extends State<Library> {
       (Platform.isAndroid || Platform.isIOS) ? 0.0 : 10.0;
 
   Future<List<CoverTile>> getBookTiles() async {
-    var books = Books();
-    await books.buildBookTiles();
-    bookTiles = books.coverTilesList;
+    var library = Library();
+    await library.buildBookTiles();
+    bookTiles = library.coverTilesList;
     return bookTiles;
   }
 
