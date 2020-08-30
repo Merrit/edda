@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 // Reader Packages
 import 'package:reader/components/cover_tile.dart';
-import 'package:reader/library/books.dart';
+import 'package:reader/library/library.dart';
 import 'package:reader/settings/settings_screen.dart';
 
 class Library extends StatefulWidget {
