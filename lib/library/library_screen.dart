@@ -1,9 +1,10 @@
 // Standard Library
+import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 
 // Reader Packages
 import 'package:reader/components/cover_tile.dart';
-import 'package:reader/library/find_books.dart';
+import 'package:reader/library/books.dart';
 import 'package:reader/settings/settings_screen.dart';
 
 class Library extends StatefulWidget {
@@ -16,6 +17,10 @@ class Library extends StatefulWidget {
 class _LibraryState extends State<Library> {
   String libraryPath;
   List<CoverTile> bookTiles = [];
+  // TODO: This spacing variable should probably replaced with
+  // a media query or similar.
+  double bookMainAxisSpacing =
+      (Platform.isAndroid || Platform.isIOS) ? 0.0 : 10.0;
 
   Future<List<CoverTile>> getBookTiles() async {
     var books = Books();
@@ -40,13 +45,13 @@ class _LibraryState extends State<Library> {
         actions: [
           IconButton(
               icon: Icon(Icons.settings),
-              onPressed: () async {
-                Navigator.pushNamed(context, SettingsScreen.id);
+              onPressed: () {
+                Navigator.pushNamed(context, SettingsScreen.id).then(
+                    (value) => getBookTiles().then((tilesValue) => setState(() {
+                          bookTiles = tilesValue;
+                        })));
                 // This setState is here so it will rebuild the Library with
                 // the new library path after the settings screen is popped.
-                getBookTiles().then((value) => setState(() {
-                      bookTiles = value;
-                    }));
               }),
         ],
       ),
@@ -55,7 +60,7 @@ class _LibraryState extends State<Library> {
         child: GridView.extent(
           maxCrossAxisExtent: 200,
           crossAxisSpacing: 30,
-          mainAxisSpacing: 50.0,
+          mainAxisSpacing: bookMainAxisSpacing,
           childAspectRatio: 2 / 5,
           children: bookTiles,
         ),

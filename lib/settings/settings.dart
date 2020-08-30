@@ -27,3 +27,25 @@ class Settings {
     return prefs.get(key);
   }
 }
+
+// Future<String> checkLibraryPath() async {
+//   String libraryPath;
+//   String savedPath = await getPreference('libraryPath');
+//   if (savedPath != null) {
+//     libraryPath = savedPath;
+//     return libraryPath;
+//   } else {
+//     print('No saved path found.');
+//     return null;
+//   }
+// }
+
+// Future<void> setPreference({String key, dynamic value}) async {
+//   SharedPreferences prefs = await SharedPreferences.getInstance();
+//   prefs.setString(key, value);
+// }
+
+// Future<String> getPreference(String key) async {
+//   SharedPreferences prefs = await SharedPreferences.getInstance();
+//   return prefs.get(key);
+// }

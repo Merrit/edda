@@ -1,27 +1,35 @@
 // Standard Library
+import 'dart:io';
 import 'package:flutter/material.dart';
 
 class CoverTile extends StatelessWidget {
-  final String image;
   final String name;
+  final String filePath;
+  final String image = 'assets/cover.webp';
 
-  CoverTile({this.image, this.name});
+  CoverTile({@required this.name, @required this.filePath});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         Center(
-          child: Card(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(6),
-              child: Image.asset(
-                image,
+          child: InkWell(
+            onTap: () {
+              // var epub = File(file);
+              print(filePath);
+            },
+            child: Card(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(6),
+                child: Image.asset(
+                  image,
+                ),
               ),
+              elevation: 8,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(6)),
             ),
-            elevation: 8,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
           ),
         ),
         SizedBox(height: 10),

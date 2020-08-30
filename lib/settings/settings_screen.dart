@@ -1,10 +1,14 @@
 // Standard Library
 import 'package:flutter/material.dart';
+import 'package:path/path.dart' as path;
+import 'dart:io' show Platform;
 
 // Reader Packages
 import 'package:reader/settings/settings.dart';
 
 // Third Party Packages
+import 'package:file_picker/file_picker.dart';
+import 'package:file_picker_cross/file_picker_cross.dart';
 
 class SettingsScreen extends StatefulWidget {
   static final String id = 'settings_screen';
@@ -32,7 +36,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   void saveLibraryPath(String path) async {
     var prefs = Settings();
-    prefs.checkLibraryPath();
+    // prefs.checkLibraryPath(); // Is this needed??
     prefs.setPreference(key: 'libraryPath', value: path);
   }
 
@@ -66,45 +70,63 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 color: Color(0xFF378174),
                 padding: EdgeInsets.all(18),
                 onPressed: () {
-                  showDialog(
-                    context: context,
-                    child: Center(
-                      child: Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text('Choose Library Location'),
-                              SizedBox(
-                                width: 300,
-                                child: TextField(
-                                  autofocus: true,
-                                  onChanged: (String value) {
-                                    libraryPath = value;
-                                  },
-                                  decoration: InputDecoration(
-                                    hintText: '/path/to/Books',
-                                    suffixIcon: IconButton(
-                                      icon: Icon(Icons.done),
-                                      onPressed: () {
-                                        setState(() {
-                                          saveLibraryPath(libraryPath);
-                                          checkLibraryPath();
-                                        });
-                                        Navigator.pop(context, true);
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
+                  // FilePickerCross doesn't currently support picking a
+                  // directory, so we will pick a file from the base
+                  // directory and then parse the directory manually for now.
+                  if (Platform.isAndroid) {
+                    FilePicker.getDirectoryPath().then((value) => setState(() {
+                          libraryPath = value;
+                          saveLibraryPath(libraryPath);
+                        }));
+                  } else {
+                    FilePickerCross.pick(type: FileTypeCross.any)
+                        .then((filePicker) => setState(() {
+                              // libraryPath =
+                              //     filePicker.path; // Path of file chosen
+                              // Remove file to get directory path.
+                              libraryPath = path.dirname(filePicker.path);
+                              saveLibraryPath(libraryPath);
+                            }));
+                  }
+                  // showDialog(
+                  //   context: context,
+                  //   child: Center(
+                  //     child: Card(
+                  //       child: Padding(
+                  //         padding: const EdgeInsets.all(20.0),
+                  //         child: Column(
+                  //           mainAxisAlignment: MainAxisAlignment.center,
+                  //           mainAxisSize: MainAxisSize.min,
+                  //           children: [
+                  //             Text('Choose Library Location'),
+                  //             SizedBox(
+                  //               width: 300,
+                  //               child: TextField(
+                  //                 autofocus: true,
+                  //                 onChanged: (String value) {
+                  //                   libraryPath = value;
+                  //                 },
+                  //                 decoration: InputDecoration(
+                  //                   hintText: '/path/to/Books',
+                  //                   suffixIcon: IconButton(
+                  //                     icon: Icon(Icons.done),
+                  //                     onPressed: () {
+                  //                       // setState(() {
+                  //                       //   saveLibraryPath(libraryPath);
+                  //                       //   checkLibraryPath();
+                  //                       // });
+                  //                       Navigator.pop(context, true);
+                  //                     },
+                  //                   ),
+                  //                 ),
+                  //               ),
+                  //             ),
+                  //           ],
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ),
+                  // );
                 },
                 child: Text(
                   'Change Location',
