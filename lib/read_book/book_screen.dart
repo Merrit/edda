@@ -1,4 +1,5 @@
 import 'package:edda/read_book/book.dart';
+import 'package:edda/read_book/epub.dart';
 import 'package:flutter/material.dart';
 
 class BookScreen extends StatefulWidget {
@@ -12,6 +13,8 @@ class _BookScreenState extends State<BookScreen> {
   @override
   Widget build(BuildContext context) {
     var filePath = ModalRoute.of(context).settings.arguments;
+    var book = Book(filePath: filePath);
+
     return Scaffold(
       body: Center(
         child: Column(
@@ -19,7 +22,7 @@ class _BookScreenState extends State<BookScreen> {
             Expanded(
               child: SingleChildScrollView(
                 child: Text(
-                  readBookFile(filePath),
+                  book.book,
                 ),
               ),
             ),
