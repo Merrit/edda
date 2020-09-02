@@ -3,7 +3,7 @@ import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 
 // Edda Packages
-import 'package:edda/components/cover_tile.dart';
+import 'package:edda/library/cover_tile.dart';
 import 'package:edda/library/library.dart';
 import 'package:edda/settings/settings_screen.dart';
 

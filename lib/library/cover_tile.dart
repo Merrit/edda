@@ -7,11 +7,12 @@ import 'package:flutter/material.dart';
 import 'package:edda/read_book/book.dart';
 
 class CoverTile extends StatelessWidget {
-  final String name;
-  final String filePath;
+  // final String name;
+  // final String filePath;
   final String image = 'assets/cover.webp';
+  final Book book;
 
-  CoverTile({@required this.name, @required this.filePath});
+  CoverTile({@required this.book});
 
   @override
   Widget build(BuildContext context) {
@@ -23,15 +24,15 @@ class CoverTile extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => BookScreen(filePath: filePath),
+                  builder: (context) => BookScreen(book: book),
                 ),
               );
             },
             child: Card(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(6),
-                child: Image.asset(
-                  image,
+                child: Image.memory(
+                  book.coverImage,
                 ),
               ),
               elevation: 8,
@@ -42,7 +43,7 @@ class CoverTile extends StatelessWidget {
         ),
         SizedBox(height: 10),
         Text(
-          name,
+          book.title,
           style: TextStyle(fontSize: 20),
           overflow: TextOverflow.ellipsis,
           maxLines: 3,

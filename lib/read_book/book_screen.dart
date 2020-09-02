@@ -4,28 +4,31 @@ import 'package:flutter/material.dart';
 
 class BookScreen extends StatefulWidget {
   static final String id = 'book_screen';
-  final String filePath;
+  final Book book;
 
-  BookScreen({@required this.filePath});
+  BookScreen({@required this.book});
 
   @override
   _BookScreenState createState() => _BookScreenState();
 }
 
 class _BookScreenState extends State<BookScreen> {
-  String filePath;
+  // String filePath;
   Book book;
+  String title;
 
-  void getBook() {
-    book = Book(filePath: filePath);
-    book.getBookData();
-  }
+  // void getBook() {
+  //   book = Book(filePath: filePath);
+  //   book.getBookData().then((value) => setState(() {
+  //         // setState is called to make sure state has the book info.
+  //       }));
+  // }
 
   @override
   void initState() {
     super.initState();
-    filePath = widget.filePath;
-    getBook();
+    book = widget.book;
+    // getBook();
   }
 
   @override

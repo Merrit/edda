@@ -1,6 +1,7 @@
 import 'dart:io';
+import 'package:edda/read_book/book.dart';
 import 'package:path/path.dart' as path;
-import 'package:edda/components/cover_tile.dart';
+import 'package:edda/library/cover_tile.dart';
 import 'package:edda/helpers/check_file_type.dart';
 import 'package:edda/settings/settings.dart';
 
@@ -8,21 +9,21 @@ import 'package:edda/settings/settings.dart';
 class Library {
   String libraryPath;
   List<CoverTile> coverTilesList = [];
-  Map<String, dynamic> bookFiles = {}; // Map<name, filePath>
+  Map<String, dynamic> bookFiles = {}; // Map<bookName, filePath>
 
   Future<void> findBooks() async {
-    var prefs = Settings();
+    Settings prefs = Settings();
     libraryPath = await prefs.checkLibraryPath();
     if (libraryPath == null) {
       print('No library path is set');
     } else {
       Directory library = Directory(libraryPath);
       List files = library.listSync();
-      files.forEach((element) {
-        String fileType = checkFileType(element);
-        if (fileType == '.epub' || fileType == '.cbz') {
-          String bookName = path.basenameWithoutExtension(element.path);
-          bookFiles[bookName] = element.path;
+      files.forEach((file) {
+        String fileType = checkFileType(file);
+        if (fileType == '.epub') {
+          String bookName = path.basenameWithoutExtension(file.path);
+          bookFiles[bookName] = file.path;
         }
       });
     }
@@ -30,8 +31,10 @@ class Library {
 
   Future<void> buildBookTiles() async {
     await findBooks(); // Populate the bookFiles Map
-    bookFiles.forEach((key, value) {
-      var coverTile = CoverTile(name: key, filePath: value);
+    bookFiles.forEach((bookName, filePath) async {
+      Book book = Book(filePath: filePath);
+      await book.getBookData();
+      CoverTile coverTile = CoverTile(book: book);
       coverTilesList.add(coverTile);
     });
   }

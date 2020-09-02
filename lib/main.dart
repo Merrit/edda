@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
       routes: {
         LibraryScreen.id: (context) => LibraryScreen(),
         SettingsScreen.id: (context) => SettingsScreen(),
-        BookScreen.id: (context) => BookScreen(),
+        // BookScreen.id: (context) => BookScreen(),
       },
       initialRoute: LibraryScreen.id,
       debugShowCheckedModeBanner: false,
