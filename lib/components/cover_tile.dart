@@ -20,7 +20,12 @@ class CoverTile extends StatelessWidget {
         Center(
           child: InkWell(
             onTap: () {
-              Navigator.pushNamed(context, BookScreen.id, arguments: filePath);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => BookScreen(filePath: filePath),
+                ),
+              );
             },
             child: Card(
               child: ClipRRect(

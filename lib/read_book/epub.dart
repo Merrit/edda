@@ -1,4 +1,4 @@
-// Standard Library
+/* // Standard Library
 import 'dart:convert';
 import 'dart:io';
 import 'package:meta/meta.dart';
@@ -7,23 +7,33 @@ import 'package:meta/meta.dart';
 import 'package:archive/archive.dart';
 import 'package:archive/archive_io.dart';
 import 'package:xml/xml.dart';
+import 'package:xml2json/xml2json.dart';
 
 class Epub {
   final Map<String, dynamic> metadata;
   final String filePath;
-  // final String title;
-  // final String author;
-  // final String series;
-  // final int publicationDate;
-  // final coverImage;
-  // final chapters;
-  // final pages;
 
   Epub({@required this.filePath}) : this.metadata = loadEpubFile(filePath);
 }
 
+// XML
+//
+// Tag A tag is a markup construct that begins with < and ends with >.
+//
+// Element An element is a logical document component that either begins with a
+// start-tag and ends with a matching end-tag or consists only of an
+// empty-element tag. The characters between the start-tag and end-tag, if any,
+// are the element's content, and may contain markup, including other elements,
+// which are called child elements. An example is <greeting>Hello,
+// world!</greeting>.
+//
+// Attribute An attribute is a markup construct consisting of a name–value pair
+// that exists within a start-tag. An example is <img src="madonna.jpg"
+// alt="Madonna" />, where the names of the attributes are "src" and "alt", and
+// their values are "madonna.jpg" and "Madonna" respectively.
+
 Map<String, dynamic> loadEpubFile(String filePath) {
-  Map<String, dynamic> metadata;
+  // Map<String, dynamic> metadata;
   var bytes;
   // Read file from disk
   try {
@@ -34,12 +44,15 @@ Map<String, dynamic> loadEpubFile(String filePath) {
   // Decode zipped file.
   // .cbz and .epub should be unencrypted zip files.
   Archive archive = ZipDecoder().decodeBytes(bytes);
+  // Find & parse container.xml
   ArchiveFile container = archive.findFile('META-INF/container.xml');
   XmlDocument containerXml = XmlDocument.parse(utf8.decode(container.content));
+  // Find & parse .opf file.
   String opfFilePath = findOpf(containerXml);
   ArchiveFile opfFile = archive.findFile(opfFilePath);
   XmlDocument opfFileXml = XmlDocument.parse(utf8.decode(opfFile.content));
-  Map<String, dynamic> _opfFields = parseOpf(opfFileXml);
+  // Populate metadata map from the .opf file.
+  Map<String, dynamic> metadata = parseOpf(opfFileXml);
   // metadata['title'] = _opfFields['title'];
   return metadata;
 }
@@ -58,4 +71,29 @@ String findOpf(XmlDocument containerXml) {
   return rootFile;
 }
 
-Map<String, dynamic> parseOpf(XmlDocument opfFileXml) {}
+Map<String, dynamic> parseOpf(XmlDocument opfFileXml) {
+  Map<String, dynamic> fields = Map();
+  // Get Title
+  Iterable<XmlElement> titleXml = opfFileXml.findAllElements('dc:title');
+  if (titleXml.length == 1) {
+    fields['title'] = titleXml.first.innerText;
+  }
+  // Get Author
+  Iterable<XmlElement> authorXml = opfFileXml.findAllElements('dc:creator');
+  if (titleXml.length == 1) {
+    fields['author'] = authorXml.first.getAttribute('opf:file-as');
+  }
+  // Get Cover
+  var coverXml = opfFileXml.findAllElements('meta');
+  var meta = coverXml.first.getAttribute('content');
+  var cover = opfFileXml.findAllElements('cover');
+  // var test = opfFileXml.findAllElements('item');
+  // var test2 = test.firstWhere((element) => element.attributes.contains(meta));
+  print(cover);
+  // cover.forEach((element) {
+  //   if (element.name.toString() == 'item' && element.)
+  // });
+
+  return fields;
+}
+ */
