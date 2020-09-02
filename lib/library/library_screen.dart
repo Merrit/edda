@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 // Edda Packages
 import 'package:edda/library/cover_tile.dart';
 import 'package:edda/library/library.dart';
+import 'package:edda/library/cover_tile_build.dart';
 import 'package:edda/settings/settings_screen.dart';
 
 class LibraryScreen extends StatefulWidget {
@@ -21,13 +22,6 @@ class _LibraryScreenState extends State<LibraryScreen> {
   // a media query or similar.
   double bookMainAxisSpacing =
       (Platform.isAndroid || Platform.isIOS) ? 0.0 : 10.0;
-
-  Future<List<CoverTile>> getBookTiles() async {
-    var library = Library();
-    await library.buildBookTiles();
-    bookTiles = library.coverTilesList;
-    return bookTiles;
-  }
 
   @override
   void initState() {

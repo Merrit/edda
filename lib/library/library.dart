@@ -32,10 +32,13 @@ class Library {
   Future<void> buildBookTiles() async {
     await findBooks(); // Populate the bookFiles Map
     bookFiles.forEach((bookName, filePath) async {
+      // Call a CoverTile for $filePath
+      // The covertile should handle everything else
       Book book = Book(filePath: filePath);
       await book.getBookData();
-      CoverTile coverTile = CoverTile(book: book);
+      CoverTile coverTile = CoverTile(bookName: bookName, filePath: filePath);
       coverTilesList.add(coverTile);
+      //
     });
   }
 }

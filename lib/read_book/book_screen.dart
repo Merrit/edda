@@ -37,7 +37,7 @@ class _BookScreenState extends State<BookScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(book.title),
+        title: Text('book.title'),
       ),
       body: Center(
         child: Column(
@@ -45,7 +45,7 @@ class _BookScreenState extends State<BookScreen> {
             Expanded(
               child: SingleChildScrollView(
                 child: Text(
-                  book.author,
+                  'book.author',
                 ),
               ),
             ),

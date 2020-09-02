@@ -2,18 +2,20 @@ import 'package:edda/helpers/check_file_type.dart';
 import 'package:epub/epub.dart';
 import 'package:meta/meta.dart';
 import 'dart:io';
-import 'package:image/image.dart' as image;
+import 'package:flutter/material.dart' as flutter;
+// import 'package:image/image.dart' hide Image;
 
 class Book {
   final filePath;
   final fileType;
+  var bookFile;
   var data;
-  String title = '';
-  String author = '';
+  Future<String> title;
+  Future<String> author;
   String series = '';
   int publicationDate;
   // List<int> defaultCoverImage;
-  List<int> coverImage;
+  Future<flutter.Image> coverImage;
   var chapters;
   var pages;
   Map<String, dynamic> metadata;
@@ -27,33 +29,54 @@ class Book {
     // author = (metadata['author'] != null) ? metadata['author'] : '';
 
     //Get the epub into memory somehow
-    var epubFile = File(filePath);
+    File epubFile = File(filePath);
     List<int> bytes = await epubFile.readAsBytes();
 
     // Opens a book and reads all of its content into memory
-    EpubBook epubBook = await EpubReader.readBook(bytes);
+    var bookFile = await EpubReader.readBook(bytes).then((value) => () {
+          // Book's title
+          title = getTitle();
+
+          // Book's authors (comma separated list)
+          author = getAuthor();
+
+          // Book's authors (list of authors names)
+          // List<String> authors = epubBook.AuthorList;
+
+          // Book's cover image (null if there is no cover)
+          // List<int> defaultCover = File('assets/cover.webp').readAsBytesSync();
+          coverImage = getCoverImage();
+        });
 
     // COMMON PROPERTIES
 
-    // Book's title
-    title = epubBook.Title;
-
-    // Book's authors (comma separated list)
-    author = epubBook.Author;
-
-    // Book's authors (list of authors names)
-    // List<String> authors = epubBook.AuthorList;
-
-    // Book's cover image (null if there is no cover)
-    // List<int> defaultCover = File('assets/cover.webp').readAsBytesSync();
-    coverImage = (epubBook.CoverImage != null)
+    /* if (bookFile.CoverImage != null) {
+      coverImage = bookFile.CoverImage;
+    } */
+    // : getDefaultCoverImage();
+    /* coverImage = (epubBook.CoverImage != null)
         ? image.encodePng(epubBook.CoverImage)
-        : getDefaultCoverImage();
+        : getDefaultCoverImage(); */
     // print('coverImage: $coverImage');
     // print('defaultCover: $defaultCover');
   }
 
-  List<int> getDefaultCoverImage() {
-    return File('assets/cover.webp').readAsBytesSync();
+  Future<String> getTitle() {
+    var title = bookFile.title;
+    return title;
   }
+
+  Future<String> getAuthor() {
+    var author = bookFile.author;
+    return author;
+  }
+
+  Future<flutter.Image> getCoverImage() {
+    var cover = bookFile.CoverImage;
+    return cover;
+  }
+
+  /* List<int> getDefaultCoverImage() {
+    return File('assets/cover.webp').readAsBytesSync();
+  } */
 }
