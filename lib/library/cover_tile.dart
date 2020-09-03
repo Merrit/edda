@@ -1,6 +1,7 @@
 // Standard Library
 import 'dart:io';
 
+import 'package:edda/library/cover_tile_build.dart';
 import 'package:edda/read_book/book_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -21,18 +22,49 @@ class CoverTile extends StatefulWidget {
 class _CoverTileState extends State<CoverTile> {
   final String coverImageDefault = 'assets/cover.webp';
   Book book;
-  Future<String> title;
-  Future<Image> coverImage;
+  // Future<String> title;
+  String title = 'Title';
+  Future<String> author;
+  Future coverImage;
 
   @override
   void initState() {
     super.initState();
-    book = Book(filePath: widget.filePath);
-    book.getBookData().then((value) => () {
-          title = book.title;
-          coverImage = book.coverImage;
+    // book = loadBookData(filePath: widget.filePath);
+    // book.loadBook()
+    _loadBookData(filePath: widget.filePath).then((book) => () {
+          title = book.getTitle();
         });
+
+    // .then((value) => () {
+    //       title = book.title;
+    //       coverImage = book.coverImage;
+    //     })
   }
+
+  Future _loadBookData({@required String filePath}) async {
+    // var book = Book(filePath: filePath);
+    book = Book(filePath: widget.filePath);
+    await book.loadBook();
+    // title = book.getTitle();
+    // print(title);
+    // author = book.author;
+    // coverImage = book.coverImage;
+
+    return book;
+  }
+
+/*   @override
+void initState() {
+  super.initState();
+  checkList = []; //It is important
+  this.loadBookData();
+}
+
+Future<void> getCheckList() async{
+  checkList = await CheckList.browse();
+  setState({});
+} */
 
   @override
   Widget build(BuildContext context) {
@@ -53,13 +85,12 @@ class _CoverTileState extends State<CoverTile> {
                 borderRadius: BorderRadius.circular(6),
                 child: FutureBuilder(
                   future: coverImage,
-                  initialData: Image.asset(coverImageDefault),
+                  // initialData: ,
                   builder: (BuildContext context, AsyncSnapshot snapshot) {
-                    if (snapshot.hasData) {
-                      book.coverImage
-                      return coverImage;
+                    if (snapshot.hasData == false) {
+                      return Image.asset(coverImageDefault);
                     }
-                    return;
+                    return snapshot.data;
                   },
                 ),
               ),
@@ -71,7 +102,7 @@ class _CoverTileState extends State<CoverTile> {
         ),
         SizedBox(height: 10),
         Text(
-          'widget.book.title',
+          title,
           style: TextStyle(fontSize: 20),
           overflow: TextOverflow.ellipsis,
           maxLines: 3,
@@ -80,3 +111,24 @@ class _CoverTileState extends State<CoverTile> {
     );
   }
 }
+
+/*         FutureBuilder(
+          future: title,
+          // initialData: InitialData,
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+            if (snapshot.hasData == false) {
+              return Text(
+                'Title',
+                style: TextStyle(fontSize: 20),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 3,
+              );
+            }
+            return Text(
+              snapshot.data,
+              style: TextStyle(fontSize: 20),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 3,
+            );
+          },
+        ), */

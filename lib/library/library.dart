@@ -34,8 +34,6 @@ class Library {
     bookFiles.forEach((bookName, filePath) async {
       // Call a CoverTile for $filePath
       // The covertile should handle everything else
-      Book book = Book(filePath: filePath);
-      await book.getBookData();
       CoverTile coverTile = CoverTile(bookName: bookName, filePath: filePath);
       coverTilesList.add(coverTile);
       //

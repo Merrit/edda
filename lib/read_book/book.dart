@@ -10,8 +10,8 @@ class Book {
   final fileType;
   var bookFile;
   var data;
-  Future<String> title;
-  Future<String> author;
+  String title;
+  String author;
   String series = '';
   int publicationDate;
   // List<int> defaultCoverImage;
@@ -22,7 +22,7 @@ class Book {
 
   Book({@required this.filePath}) : this.fileType = checkFileType(filePath);
 
-  Future<void> getBookData() async {
+  Future<void> loadBook() async {
     // data = Epub(filePath: filePath);
     // metadata = data.metadata;
     // title = (metadata['title'] != null) ? metadata['title'] : '';
@@ -30,23 +30,28 @@ class Book {
 
     //Get the epub into memory somehow
     File epubFile = File(filePath);
-    List<int> bytes = await epubFile.readAsBytes();
+    List<int> bytes = epubFile.readAsBytesSync();
 
     // Opens a book and reads all of its content into memory
-    var bookFile = await EpubReader.readBook(bytes).then((value) => () {
-          // Book's title
-          title = getTitle();
+    // bookFile = await EpubReader.readBook(bytes);
 
-          // Book's authors (comma separated list)
-          author = getAuthor();
+    // bookFile = await
+    EpubBook bookContent = await EpubReader.readBook(bytes);
+    bookFile = bookContent;
 
-          // Book's authors (list of authors names)
-          // List<String> authors = epubBook.AuthorList;
+    // Book's title
+    // title = getTitle();
+    // title = bookFile.Title;
 
-          // Book's cover image (null if there is no cover)
-          // List<int> defaultCover = File('assets/cover.webp').readAsBytesSync();
-          coverImage = getCoverImage();
-        });
+    // Book's authors (comma separated list)
+    // author = getAuthor();
+
+    // Book's authors (list of authors names)
+    // List<String> authors = epubBook.AuthorList;
+
+    // Book's cover image (null if there is no cover)
+    // List<int> defaultCover = File('assets/cover.webp').readAsBytesSync();
+    // coverImage = getCoverImage();
 
     // COMMON PROPERTIES
 
@@ -61,20 +66,22 @@ class Book {
     // print('defaultCover: $defaultCover');
   }
 
-  Future<String> getTitle() {
-    var title = bookFile.title;
+  String getTitle() {
+    // Future<String> title = Future.value(bookFile.Title);
+    title = bookFile.Title;
     return title;
   }
 
-  Future<String> getAuthor() {
-    var author = bookFile.author;
-    return author;
-  }
+  // Future<String> getAuthor() {
+  //   author = bookFile.author;
+  //   return author;
+  // }
 
-  Future<flutter.Image> getCoverImage() {
-    var cover = bookFile.CoverImage;
-    return cover;
-  }
+  // Future<flutter.Image> getCoverImage() {
+  //   // var coverImageData = bookFile.CoverImage;
+  //   coverImage = bookFile.CoverImage;
+  //   return coverImage;
+  // }
 
   /* List<int> getDefaultCoverImage() {
     return File('assets/cover.webp').readAsBytesSync();
