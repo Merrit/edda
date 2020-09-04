@@ -66,20 +66,3 @@ class _LibraryScreenState extends State<LibraryScreen> {
     );
   }
 }
-
-class LibraryChildCoverTile extends StatefulWidget {
-  final Function function;
-  final List<CoverTile> bookTiles;
-
-  LibraryChildCoverTile({@required this.function, @required this.bookTiles});
-
-  @override
-  _LibraryChildCoverTileState createState() => _LibraryChildCoverTileState();
-}
-
-class _LibraryChildCoverTileState extends State<LibraryChildCoverTile> {
-  @override
-  Widget build(BuildContext context) {
-    return widget.bookTiles;
-  }
-}

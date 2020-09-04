@@ -22,49 +22,27 @@ class CoverTile extends StatefulWidget {
 class _CoverTileState extends State<CoverTile> {
   final String coverImageDefault = 'assets/cover.webp';
   Book book;
-  // Future<String> title;
-  String title = 'Title';
-  Future<String> author;
-  Future coverImage;
+  String title = '';
+  String author = '';
+  Image coverImage = Image.asset('assets/cover.webp');
 
   @override
   void initState() {
     super.initState();
-    // book = loadBookData(filePath: widget.filePath);
-    // book.loadBook()
-    _loadBookData(filePath: widget.filePath).then((book) => () {
-          title = book.getTitle();
-        });
-
-    // .then((value) => () {
-    //       title = book.title;
-    //       coverImage = book.coverImage;
-    //     })
+    _loadBookData(filePath: widget.filePath);
   }
 
-  Future _loadBookData({@required String filePath}) async {
-    // var book = Book(filePath: filePath);
+  _loadBookData({@required String filePath}) async {
     book = Book(filePath: widget.filePath);
     await book.loadBook();
-    // title = book.getTitle();
-    // print(title);
-    // author = book.author;
-    // coverImage = book.coverImage;
-
-    return book;
+    setState(() {
+      title = book.title;
+      author = book.author;
+      if (book.coverImage != null) {
+        coverImage = book.coverImage;
+      }
+    });
   }
-
-/*   @override
-void initState() {
-  super.initState();
-  checkList = []; //It is important
-  this.loadBookData();
-}
-
-Future<void> getCheckList() async{
-  checkList = await CheckList.browse();
-  setState({});
-} */
 
   @override
   Widget build(BuildContext context) {
@@ -76,23 +54,14 @@ Future<void> getCheckList() async{
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    // builder: (context) => BookScreen(book: book.book),
-                    ),
+                  builder: (context) => BookScreen(book: book),
+                ),
               );
             },
             child: Card(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(6),
-                child: FutureBuilder(
-                  future: coverImage,
-                  // initialData: ,
-                  builder: (BuildContext context, AsyncSnapshot snapshot) {
-                    if (snapshot.hasData == false) {
-                      return Image.asset(coverImageDefault);
-                    }
-                    return snapshot.data;
-                  },
-                ),
+                child: coverImage,
               ),
               elevation: 8,
               shape: RoundedRectangleBorder(
@@ -103,7 +72,14 @@ Future<void> getCheckList() async{
         SizedBox(height: 10),
         Text(
           title,
-          style: TextStyle(fontSize: 20),
+          style: TextStyle(fontSize: 18),
+          overflow: TextOverflow.ellipsis,
+          maxLines: 3,
+        ),
+        SizedBox(height: 10),
+        Text(
+          author,
+          style: TextStyle(fontSize: 14),
           overflow: TextOverflow.ellipsis,
           maxLines: 3,
         ),
@@ -112,23 +88,13 @@ Future<void> getCheckList() async{
   }
 }
 
-/*         FutureBuilder(
-          future: title,
-          // initialData: InitialData,
-          builder: (BuildContext context, AsyncSnapshot snapshot) {
-            if (snapshot.hasData == false) {
-              return Text(
-                'Title',
-                style: TextStyle(fontSize: 20),
-                overflow: TextOverflow.ellipsis,
-                maxLines: 3,
-              );
-            }
-            return Text(
-              snapshot.data,
-              style: TextStyle(fontSize: 20),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 3,
-            );
-          },
-        ), */
+// FutureBuilder(
+//                   future: coverImage,
+//                   // initialData: ,
+//                   builder: (BuildContext context, AsyncSnapshot snapshot) {
+//                     if (snapshot.hasData == false) {
+//                       return Image.asset(coverImageDefault);
+//                     }
+//                     return snapshot.data;
+//                   },
+//                 ),
