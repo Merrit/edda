@@ -7,11 +7,11 @@ import 'package:edda/settings/settings.dart';
 
 /// The main library view of the application.
 class Library {
-  String libraryPath;
-  List<CoverTile> coverTilesList = [];
-  Map<String, dynamic> bookFiles = {}; // Map<bookName, filePath>
+  /// Find supported files in library path.
+  static Future<List<String>> _findBooks() async {
+    String libraryPath;
+    List<String> bookFiles = [];
 
-  Future<void> findBooks() async {
     Settings prefs = Settings();
     libraryPath = await prefs.checkLibraryPath();
     if (libraryPath == null) {
@@ -22,21 +22,24 @@ class Library {
       files.forEach((file) {
         String fileType = checkFileType(file);
         if (fileType == '.epub') {
-          String bookName = path.basenameWithoutExtension(file.path);
-          bookFiles[bookName] = file.path;
+          bookFiles.add(file.path);
         }
       });
     }
+    return bookFiles;
   }
 
-  Future<void> buildBookTiles() async {
-    await findBooks(); // Populate the bookFiles Map
-    bookFiles.forEach((bookName, filePath) async {
-      // Call a CoverTile for $filePath
-      // The covertile should handle everything else
-      CoverTile coverTile = CoverTile(bookName: bookName, filePath: filePath);
+  /// Create a CoverTile for each supported type of file found in path.
+  /// Initially no metadata will be present so the library view loads
+  /// quickly - the cover, title, etc can be loaded after that.
+  static Future<List<CoverTile>> buildBookTiles() async {
+    List<CoverTile> coverTilesList = [];
+
+    List<String> books = await _findBooks();
+    books.forEach((filePath) {
+      CoverTile coverTile = CoverTile(filePath: filePath);
       coverTilesList.add(coverTile);
-      //
     });
+    return coverTilesList;
   }
 }

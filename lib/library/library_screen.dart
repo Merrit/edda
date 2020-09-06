@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 // Edda Packages
 import 'package:edda/library/cover_tile.dart';
 import 'package:edda/library/library.dart';
-import 'package:edda/library/cover_tile_build.dart';
 import 'package:edda/settings/settings_screen.dart';
 
 class LibraryScreen extends StatefulWidget {
@@ -26,8 +25,11 @@ class _LibraryScreenState extends State<LibraryScreen> {
   @override
   void initState() {
     super.initState();
-    getBookTiles().then((value) => setState(() {
-          // TODO: create an async function rather than doing .then => setState here
+    _getBookTiles();
+  }
+
+  void _getBookTiles() async {
+    Library.buildBookTiles().then((value) => setState(() {
           bookTiles = value;
         }));
   }
@@ -41,8 +43,8 @@ class _LibraryScreenState extends State<LibraryScreen> {
           IconButton(
               icon: Icon(Icons.settings),
               onPressed: () {
-                Navigator.pushNamed(context, SettingsScreen.id).then(
-                    (value) => getBookTiles().then((tilesValue) => setState(() {
+                Navigator.pushNamed(context, SettingsScreen.id).then((value) =>
+                    Library.buildBookTiles().then((tilesValue) => setState(() {
                           bookTiles = tilesValue;
                         })));
                 // This setState is here so it will rebuild the Library with

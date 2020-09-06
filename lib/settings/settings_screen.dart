@@ -1,16 +1,15 @@
 // Standard Library
 import 'package:flutter/material.dart';
-import 'package:path/path.dart' as path;
 import 'dart:io' show Platform;
 
+// Experimental Packages
 import 'package:file_chooser/file_chooser.dart' as FileChooser;
-
-// Edda Packages
-import 'package:edda/settings/settings.dart';
 
 // Third Party Packages
 import 'package:file_picker/file_picker.dart';
-// import 'package:file_picker_cross/file_picker_cross.dart';
+
+// Edda Packages
+import 'package:edda/settings/settings.dart';
 
 class SettingsScreen extends StatefulWidget {
   static final String id = 'settings_screen';
@@ -72,9 +71,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               color: Color(0xFF378174),
               padding: EdgeInsets.all(18),
               onPressed: () async {
-                // FilePickerCross doesn't currently support picking a
-                // directory, so we will pick a file from the base
-                // directory and then parse the directory manually for now.
                 if (Platform.isAndroid || Platform.isIOS) {
                   // Web too?
                   // Picking from 'Downloads' on Android doesn't currently work,

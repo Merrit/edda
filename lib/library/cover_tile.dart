@@ -1,7 +1,6 @@
 // Standard Library
 import 'dart:io';
 
-import 'package:edda/library/cover_tile_build.dart';
 import 'package:edda/read_book/book_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -10,10 +9,9 @@ import 'package:edda/read_book/book.dart';
 import 'package:edda/library/library.dart';
 
 class CoverTile extends StatefulWidget {
-  final String bookName;
   final String filePath;
 
-  CoverTile({@required this.bookName, @required this.filePath});
+  CoverTile({@required this.filePath});
 
   @override
   _CoverTileState createState() => _CoverTileState();
@@ -65,7 +63,8 @@ class _CoverTileState extends State<CoverTile> {
               ),
               elevation: 8,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(6)),
+                borderRadius: BorderRadius.circular(6),
+              ),
             ),
           ),
         ),
