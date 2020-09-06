@@ -1,3 +1,39 @@
+import 'dart:io';
+import 'package:meta/meta.dart';
+import 'package:epub/epub.dart';
+
+class Epub {
+  final String filePath;
+  EpubBookRef epub;
+  String title;
+  String author;
+
+  Epub({@required this.filePath});
+
+  Future<void> loadEpub() async {
+    File epubFile = File(filePath);
+    List<int> bytes = epubFile.readAsBytesSync();
+    // Open epub without immediately reading any content.
+    epub = await EpubReader.openBook(bytes);
+    title = epub.Title;
+    author = epub.Author;
+  }
+
+  Image getCoverImage() {
+    /* if (bookFile.CoverImage != null) {
+      coverImage = bookFile.CoverImage;
+    } */
+    // : getDefaultCoverImage();
+    /* coverImage = (epubBook.CoverImage != null)
+        ? image.encodePng(epubBook.CoverImage)
+        : getDefaultCoverImage(); */
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/*                       Self attempt to read epub below                      */
+/* -------------------------------------------------------------------------- */
+
 /* // Standard Library
 import 'dart:convert';
 import 'dart:io';

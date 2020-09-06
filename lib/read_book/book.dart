@@ -5,10 +5,11 @@ import 'dart:io';
 import 'package:flutter/material.dart' as flutter;
 import 'package:image/image.dart' as image;
 // import 'package:image/image.dart' hide Image;
+import 'package:edda/read_book/epub.dart';
 
 class Book {
-  final filePath;
-  final fileType;
+  final String filePath;
+  final String fileType;
   EpubBook bookContent;
   var data;
   String title = '';
@@ -20,56 +21,15 @@ class Book {
   var pages;
   Map<String, dynamic> metadata;
 
-  Book({@required this.filePath}) : this.fileType = checkFileType(filePath);
+  Book({@required this.filePath, @required this.fileType});
 
   Future<void> loadBook() async {
-    //Get the epub into memory somehow
-    File epubFile = File(filePath);
-    List<int> bytes = epubFile.readAsBytesSync();
-
-    // Opens a book and reads all of its content into memory
-    bookContent = await EpubReader.readBook(bytes);
-
-    // Book's title
-    title = bookContent.Title;
-
-    // Book's authors (comma separated list)
-    author = bookContent.Author;
-
-    // Book's cover image (null if there is no cover)
-    // var epubCoverImage = bookContent.CoverImage;
-    // var epubCoverBytes = epubCoverImage.getBytes();
-    coverImage = flutter.Image.memory(image.encodePng(bookContent.CoverImage));
-
-    // COMMON PROPERTIES
-
-    /* if (bookFile.CoverImage != null) {
-      coverImage = bookFile.CoverImage;
-    } */
-    // : getDefaultCoverImage();
-    /* coverImage = (epubBook.CoverImage != null)
-        ? image.encodePng(epubBook.CoverImage)
-        : getDefaultCoverImage(); */
+    switch (fileType) {
+      case '.epub':
+        Epub epub = Epub(filePath: filePath);
+        await epub.loadEpub();
+        title = epub.title;
+        author = epub.author;
+    }
   }
-
-  // String getTitle() {
-  //   // Future<String> title = Future.value(bookFile.Title);
-  //   title = bookFile.Title;
-  //   return title;
-  // }
-
-  // Future<String> getAuthor() {
-  //   author = bookFile.author;
-  //   return author;
-  // }
-
-  // Future<flutter.Image> getCoverImage() {
-  //   // var coverImageData = bookFile.CoverImage;
-  //   coverImage = bookFile.CoverImage;
-  //   return coverImage;
-  // }
-
-  /* List<int> getDefaultCoverImage() {
-    return File('assets/cover.webp').readAsBytesSync();
-  } */
 }

@@ -7,10 +7,13 @@ import 'package:edda/settings/settings.dart';
 
 /// The main library view of the application.
 class Library {
-  /// Find supported files in library path.
-  static Future<List<String>> _findBooks() async {
+  /// Find supported files in the library path.
+  /// Supported files are returned as a Map<String, String> in the form
+  /// of {path: fileType}. File type is included so it doesn't have to be
+  /// checked again later when we decide how to read the file.
+  static Future<Map<String, String>> _findBooks() async {
     String libraryPath;
-    List<String> bookFiles = [];
+    Map<String, String> bookFiles = {};
 
     Settings prefs = Settings();
     libraryPath = await prefs.checkLibraryPath();
@@ -21,8 +24,9 @@ class Library {
       List files = library.listSync();
       files.forEach((file) {
         String fileType = checkFileType(file);
+        String path = file.path;
         if (fileType == '.epub') {
-          bookFiles.add(file.path);
+          bookFiles[path] = fileType;
         }
       });
     }
@@ -35,9 +39,9 @@ class Library {
   static Future<List<CoverTile>> buildBookTiles() async {
     List<CoverTile> coverTilesList = [];
 
-    List<String> books = await _findBooks();
-    books.forEach((filePath) {
-      CoverTile coverTile = CoverTile(filePath: filePath);
+    Map<String, String> books = await _findBooks();
+    books.forEach((filePath, fileType) {
+      CoverTile coverTile = CoverTile(filePath: filePath, fileType: fileType);
       coverTilesList.add(coverTile);
     });
     return coverTilesList;

@@ -10,8 +10,9 @@ import 'package:edda/library/library.dart';
 
 class CoverTile extends StatefulWidget {
   final String filePath;
+  final String fileType;
 
-  CoverTile({@required this.filePath});
+  CoverTile({@required this.filePath, @required this.fileType});
 
   @override
   _CoverTileState createState() => _CoverTileState();
@@ -27,19 +28,19 @@ class _CoverTileState extends State<CoverTile> {
   @override
   void initState() {
     super.initState();
-    _loadBookData(filePath: widget.filePath);
+    _loadBookData(filePath: widget.filePath, fileType: widget.fileType);
   }
 
-  _loadBookData({@required String filePath}) async {
-/*     book = Book(filePath: widget.filePath);
+  _loadBookData({@required String filePath, @required String fileType}) async {
+    book = Book(filePath: filePath, fileType: fileType);
     await book.loadBook();
     setState(() {
       title = book.title;
       author = book.author;
-      if (book.coverImage != null) {
+      /* if (book.coverImage != null) {
         coverImage = book.coverImage;
-      }
-    }); */
+      } */
+    });
   }
 
   @override
