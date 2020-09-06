@@ -27,12 +27,9 @@ class _LibraryScreenState extends State<LibraryScreen> {
   void initState() {
     super.initState();
     getBookTiles().then((value) => setState(() {
+          // TODO: create an async function rather than doing .then => setState here
           bookTiles = value;
         }));
-  }
-
-  refresh() {
-    setState(() {});
   }
 
   @override
@@ -56,8 +53,8 @@ class _LibraryScreenState extends State<LibraryScreen> {
       body: Padding(
         padding: EdgeInsets.all(20),
         child: GridView.extent(
-          maxCrossAxisExtent: 200,
-          crossAxisSpacing: 30,
+          maxCrossAxisExtent: 180,
+          crossAxisSpacing: 15,
           mainAxisSpacing: bookMainAxisSpacing,
           childAspectRatio: 2 / 5,
           children: bookTiles,

@@ -33,7 +33,7 @@ class _CoverTileState extends State<CoverTile> {
   }
 
   _loadBookData({@required String filePath}) async {
-    book = Book(filePath: widget.filePath);
+/*     book = Book(filePath: widget.filePath);
     await book.loadBook();
     setState(() {
       title = book.title;
@@ -41,7 +41,7 @@ class _CoverTileState extends State<CoverTile> {
       if (book.coverImage != null) {
         coverImage = book.coverImage;
       }
-    });
+    }); */
   }
 
   @override
