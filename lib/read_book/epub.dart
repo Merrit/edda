@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:meta/meta.dart';
 import 'package:epub/epub.dart';
+import 'package:image/image.dart';
 
 class Epub {
   final String filePath;
@@ -19,14 +20,10 @@ class Epub {
     author = epub.Author;
   }
 
-  Image getCoverImage() {
-    /* if (bookFile.CoverImage != null) {
-      coverImage = bookFile.CoverImage;
-    } */
-    // : getDefaultCoverImage();
-    /* coverImage = (epubBook.CoverImage != null)
-        ? image.encodePng(epubBook.CoverImage)
-        : getDefaultCoverImage(); */
+  Future getCoverImage() async {
+    Image epubCoverImage = await epub.readCover();
+    var coverImage = encodePng(epubCoverImage);
+    return coverImage;
   }
 }
 

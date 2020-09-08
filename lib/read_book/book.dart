@@ -1,35 +1,45 @@
-import 'package:edda/helpers/check_file_type.dart';
-import 'package:epub/epub.dart';
+// Standard Library
+import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
-import 'dart:io';
-import 'package:flutter/material.dart' as flutter;
-import 'package:image/image.dart' as image;
-// import 'package:image/image.dart' hide Image;
+
+// Edda Packages
 import 'package:edda/read_book/epub.dart';
 
 class Book {
   final String filePath;
   final String fileType;
-  EpubBook bookContent;
-  var data;
+  dynamic handle; // Handle of the epub, cbz, etc.
   String title = '';
   String author = '';
   String series = '';
   int publicationDate;
-  flutter.Image coverImage;
-  var chapters;
-  var pages;
-  Map<String, dynamic> metadata;
+  var coverImage;
 
   Book({@required this.filePath, @required this.fileType});
 
   Future<void> loadBook() async {
     switch (fileType) {
       case '.epub':
-        Epub epub = Epub(filePath: filePath);
-        await epub.loadEpub();
-        title = epub.title;
-        author = epub.author;
+        await _loadEpub();
     }
+  }
+
+  Future getCoverImage() async {
+    switch (fileType) {
+      case '.epub':
+        await _getEpubCoverImage();
+    }
+    return coverImage;
+  }
+
+  _loadEpub() async {
+    handle = Epub(filePath: filePath);
+    await handle.loadEpub();
+    title = handle.title;
+    author = handle.author;
+  }
+
+  _getEpubCoverImage() async {
+    coverImage = await handle.getCoverImage();
   }
 }

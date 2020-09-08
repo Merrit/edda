@@ -1,13 +1,13 @@
 // Standard Library
-import 'dart:io';
-
 import 'package:edda/read_book/book_screen.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 // Edda Packages
 import 'package:edda/read_book/book.dart';
-import 'package:edda/library/library.dart';
+import 'package:edda/library/cover_image.dart';
 
+/// Represents one tile in the Library view with title, author and cover art.
 class CoverTile extends StatefulWidget {
   final String filePath;
   final String fileType;
@@ -19,11 +19,11 @@ class CoverTile extends StatefulWidget {
 }
 
 class _CoverTileState extends State<CoverTile> {
-  final String coverImageDefault = 'assets/cover.webp';
   Book book;
   String title = '';
   String author = '';
-  Image coverImage = Image.asset('assets/cover.webp');
+  Image coverImageDefault = Image(image: AssetImage('assets/cover.webp'));
+  var coverImage; // Using specific types was causing TypeError.
 
   @override
   void initState() {
@@ -37,10 +37,9 @@ class _CoverTileState extends State<CoverTile> {
     setState(() {
       title = book.title;
       author = book.author;
-      /* if (book.coverImage != null) {
-        coverImage = book.coverImage;
-      } */
     });
+
+    coverImage = compute(coverTileGetCoverImage, book);
   }
 
   @override
@@ -60,7 +59,19 @@ class _CoverTileState extends State<CoverTile> {
             child: Card(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(6),
-                child: coverImage,
+                child: FutureBuilder(
+                  future: coverImage,
+                  builder: (BuildContext context, AsyncSnapshot snapshot) {
+                    if (snapshot.hasData == false) {
+                      return CoverImage(
+                        coverImage: coverImageDefault,
+                        hasProgressIndicator: true,
+                      );
+                    }
+                    return CoverImage(
+                        coverImage: Image(image: MemoryImage(snapshot.data)));
+                  },
+                ),
               ),
               elevation: 8,
               shape: RoundedRectangleBorder(
@@ -88,13 +99,11 @@ class _CoverTileState extends State<CoverTile> {
   }
 }
 
-// FutureBuilder(
-//                   future: coverImage,
-//                   // initialData: ,
-//                   builder: (BuildContext context, AsyncSnapshot snapshot) {
-//                     if (snapshot.hasData == false) {
-//                       return Image.asset(coverImageDefault);
-//                     }
-//                     return snapshot.data;
-//                   },
-//                 ),
+/// Compute requires this to be a top-level function outside any class.
+/// Compute is required to prevent jank / hang of the UI.
+/// Returns the cover image as a Future<List<int>> because compute can only
+/// accept a few basic types.
+Future coverTileGetCoverImage(Book book) async {
+  var cover = book.getCoverImage();
+  return cover;
+}
