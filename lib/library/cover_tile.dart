@@ -85,14 +85,19 @@ class _CoverTileState extends State<CoverTile> {
           title,
           style: TextStyle(fontSize: 18),
           overflow: TextOverflow.ellipsis,
-          maxLines: 3,
+          maxLines: 2,
+          textAlign: TextAlign.center,
         ),
-        SizedBox(height: 10),
+        SizedBox(height: 5),
         Text(
           author,
-          style: TextStyle(fontSize: 14),
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.grey,
+          ),
           overflow: TextOverflow.ellipsis,
-          maxLines: 3,
+          maxLines: 1,
+          textAlign: TextAlign.center,
         ),
       ],
     );
