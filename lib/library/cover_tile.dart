@@ -23,7 +23,8 @@ class _CoverTileState extends State<CoverTile> {
   String title = '';
   String author = '';
   Image coverImageDefault = Image(image: AssetImage('assets/cover.webp'));
-  var coverImage; // Using specific types was causing TypeError.
+  var coverImageFuture; // Using specific types was causing TypeError.
+  Image coverImage;
 
   @override
   void initState() {
@@ -39,7 +40,51 @@ class _CoverTileState extends State<CoverTile> {
       author = book.author;
     });
 
-    coverImage = compute(coverTileGetCoverImage, book);
+    coverImageFuture = compute(coverTileGetCoverImage, book);
+  }
+
+  void _showBottomSheet({@required Book book}) {
+    showModalBottomSheet(
+        isScrollControlled: true,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+        ),
+        context: context,
+        builder: (context) {
+          return FractionallySizedBox(
+            heightFactor: 0.8,
+            child: Container(
+              padding: EdgeInsets.all(20),
+              child: Row(
+                children: [
+                  Card(
+                    child: ClipRRect(
+                        borderRadius: BorderRadius.circular(6),
+                        child: CoverImage(coverImage: coverImage)),
+                    elevation: 8,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 50,
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(book.title),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+          );
+        });
   }
 
   @override
@@ -49,18 +94,13 @@ class _CoverTileState extends State<CoverTile> {
         Center(
           child: InkWell(
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => BookScreen(book: book),
-                ),
-              );
+              _showBottomSheet(book: book);
             },
             child: Card(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(6),
                 child: FutureBuilder(
-                  future: coverImage,
+                  future: coverImageFuture,
                   builder: (BuildContext context, AsyncSnapshot snapshot) {
                     if (snapshot.hasData == false) {
                       return CoverImage(
@@ -68,8 +108,8 @@ class _CoverTileState extends State<CoverTile> {
                         hasProgressIndicator: true,
                       );
                     }
-                    return CoverImage(
-                        coverImage: Image(image: MemoryImage(snapshot.data)));
+                    coverImage = Image(image: MemoryImage(snapshot.data));
+                    return CoverImage(coverImage: coverImage);
                   },
                 ),
               ),
@@ -104,10 +144,10 @@ class _CoverTileState extends State<CoverTile> {
   }
 }
 
-/// Compute requires this to be a top-level function outside any class.
-/// Compute is required to prevent jank / hang of the UI.
-/// Returns the cover image as a Future<List<int>> because compute can only
-/// accept a few basic types.
+// Compute requires this to be a top-level function outside any class.
+// Compute is required to prevent jank / hang of the UI.
+// Returns the cover image as a Future<List<int>> because compute can only
+// accept a few basic types.
 Future coverTileGetCoverImage(Book book) async {
   var cover = book.getCoverImage();
   return cover;

@@ -13,7 +13,6 @@ class BookScreen extends StatefulWidget {
 }
 
 class _BookScreenState extends State<BookScreen> {
-  // String filePath;
   Book book;
   String title;
 
@@ -33,11 +32,9 @@ class _BookScreenState extends State<BookScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // filePath = ModalRoute.of(context).settings.arguments;
-
     return Scaffold(
       appBar: AppBar(
-        title: Text('book.title'),
+        title: Text(book.title),
       ),
       body: Center(
         child: Column(
@@ -45,7 +42,7 @@ class _BookScreenState extends State<BookScreen> {
             Expanded(
               child: SingleChildScrollView(
                 child: Text(
-                  'book.author',
+                  book.author,
                 ),
               ),
             ),

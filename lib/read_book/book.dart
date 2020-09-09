@@ -24,6 +24,12 @@ class Book {
     }
   }
 
+  /// Get cover image depending on file type.
+  ///
+  /// Return is a List<int> because that is what compute() can handle.
+  ///
+  /// Return is dynamic because setting specific type caused compute() to throw
+  /// TypeError.
   Future getCoverImage() async {
     switch (fileType) {
       case '.epub':
@@ -41,5 +47,6 @@ class Book {
 
   _getEpubCoverImage() async {
     coverImage = await handle.getCoverImage();
+    return coverImage;
   }
 }
