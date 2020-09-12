@@ -42,10 +42,11 @@ class _CoverTileState extends State<CoverTile> {
 
     coverImageFuture = compute(coverTileGetCoverImage, book);
     // Find a way to gather metadata that won't delay the UI. compute()??
+    // DOES it delay the UI as is?
     book.getMetadata();
   }
 
-  void _showBottomSheet({@required Book book}) {
+/*   void _showBottomSheet({@required Book book}) {
     showModalBottomSheet(
         isScrollControlled: true,
         shape: RoundedRectangleBorder(
@@ -87,7 +88,7 @@ class _CoverTileState extends State<CoverTile> {
             ),
           );
         });
-  }
+  } */
 
   @override
   Widget build(BuildContext context) {
@@ -115,7 +116,7 @@ class _CoverTileState extends State<CoverTile> {
                 }
                 book.coverImage = MemoryImage(snapshot.data);
                 return Hero(
-                    tag: book.title,
+                    tag: book.hashCode,
                     child: CoverImage(coverImage: book.coverImage));
               },
             ),

@@ -8,10 +8,6 @@ import 'package:path/path.dart' as path;
 String checkFileType(dynamic file) {
   String fileType;
   try {
-    // if (file == null) {
-    //   print('Argument was null, must be File or String');
-    //   return 'Argument was null, must be File or String';
-    // }
     fileType = (file.runtimeType == String)
         ? path.extension(file)
         : path.extension(file.path);

@@ -37,6 +37,8 @@ dependencies:
       path: plugins/file_chooser
       ref: 7b6d3925b6cf6cde843c2680c232687d79177470
   flutter_spinkit: ^4.1.2+1
+  html: ^0.14.0+3
+  # flutter_html: ^1.0.2
 
 dev_dependencies:
   flutter_test:

@@ -1,14 +1,21 @@
 import 'dart:io';
+
+import 'package:html/dom.dart';
 import 'package:meta/meta.dart';
 import 'package:epub/epub.dart';
 import 'package:image/image.dart';
+import 'package:html/parser.dart' show parse;
 
 class Epub {
   final String filePath;
   EpubBookRef epub;
   String title;
   String author;
-  var archive;
+  String series;
+  String genre;
+  String language;
+  String publicationDate;
+  String description;
 
   Epub({@required this.filePath});
 
@@ -24,19 +31,62 @@ class Epub {
   Future getCoverImage() async {
     Image epubCoverImage = await epub.readCover();
     var coverImage = encodePng(epubCoverImage);
-    await getChapters();
+    // await getChapters();
     return coverImage;
   }
 
-  Future<List<EpubChapterRef>> getChapters() async {
+/*   Future<List<EpubChapterRef>> getChapters() async {
     List<EpubChapterRef> chapters = await epub.getChapters();
     var chapter1 = chapters;
     return chapters;
-  }
+  } */
 
   void getMetadata() {
-    var metadata = epub.Schema;
-    print(metadata);
+    var metadata = epub.Schema.Package.Metadata;
+
+    // TODO: Series info?! Check epub repo.
+
+    // A LIST of dates??
+    // For now grab the first and return that.
+    if (metadata.Dates.length > 0) {
+      publicationDate = metadata.Dates[0].Date;
+      // TODO: This is sometimes returning a date AND time, we only want a time.
+      // Either add parsing to strip the time or submit pull request to epub.
+    }
+
+    // A list of genres
+    if (metadata.Subjects.length > 0) {
+      genre = metadata.Subjects.join(', ');
+      // TODO: Sometimes returns an absurd number of genres.
+      // Maybe do something like a for loop that limits to ~5 items, or just
+      // the text widget be expandable.
+    }
+
+    // Language is specified in various ways, eg: 'en-CA' and 'en' both mean
+    // 'English'.
+    // Would a book ever be in multiple languages? For now assume 1.
+    if (metadata.Languages.length == 1) {
+      String languageCode = metadata.Languages[0];
+      switch (languageCode) {
+        case 'en-CA':
+          language = 'English';
+          break;
+        case 'en':
+          language = 'English';
+          break;
+        // TODO: Add parsing for other languages and codes.
+      }
+    }
+
+    if (metadata.Description != null) {
+      // Strip away html elements.
+      // Should be able to use flutter_html package to properly display this
+      // type of content once this pull request is accepted to epub:
+      // https://github.com/orthros/dart-epub/pull/75
+      Document document = parse(metadata.Description);
+      description = parse(document.body.text).documentElement.text;
+      // description = metadata.Description;
+    }
   }
 }
 
