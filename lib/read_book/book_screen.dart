@@ -1,5 +1,4 @@
 import 'package:edda/read_book/book.dart';
-import 'package:edda/read_book/epub.dart';
 import 'package:flutter/material.dart';
 
 class BookScreen extends StatefulWidget {

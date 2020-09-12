@@ -8,6 +8,7 @@ class Epub {
   EpubBookRef epub;
   String title;
   String author;
+  var archive;
 
   Epub({@required this.filePath});
 
@@ -23,7 +24,19 @@ class Epub {
   Future getCoverImage() async {
     Image epubCoverImage = await epub.readCover();
     var coverImage = encodePng(epubCoverImage);
+    await getChapters();
     return coverImage;
+  }
+
+  Future<List<EpubChapterRef>> getChapters() async {
+    List<EpubChapterRef> chapters = await epub.getChapters();
+    var chapter1 = chapters;
+    return chapters;
+  }
+
+  void getMetadata() {
+    var metadata = epub.Schema;
+    print(metadata);
   }
 }
 

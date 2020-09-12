@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:path/path.dart' as path;
 
 /// Return the file extension as a String, for example: '.epub'

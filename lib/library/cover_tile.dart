@@ -1,5 +1,5 @@
 // Standard Library
-import 'package:edda/read_book/book_screen.dart';
+import 'package:edda/library/book_info_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -22,9 +22,9 @@ class _CoverTileState extends State<CoverTile> {
   Book book;
   String title = '';
   String author = '';
-  Image coverImageDefault = Image(image: AssetImage('assets/cover.webp'));
+  AssetImage coverImageDefault = AssetImage('assets/cover.webp');
   var coverImageFuture; // Using specific types was causing TypeError.
-  Image coverImage;
+  // MemoryImage coverImage;
 
   @override
   void initState() {
@@ -41,6 +41,8 @@ class _CoverTileState extends State<CoverTile> {
     });
 
     coverImageFuture = compute(coverTileGetCoverImage, book);
+    // Find a way to gather metadata that won't delay the UI. compute()??
+    book.getMetadata();
   }
 
   void _showBottomSheet({@required Book book}) {
@@ -63,7 +65,7 @@ class _CoverTileState extends State<CoverTile> {
                   Card(
                     child: ClipRRect(
                         borderRadius: BorderRadius.circular(6),
-                        child: CoverImage(coverImage: coverImage)),
+                        child: CoverImage(coverImage: book.coverImage)),
                     elevation: 8,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(6),
@@ -94,29 +96,28 @@ class _CoverTileState extends State<CoverTile> {
         Center(
           child: InkWell(
             onTap: () {
-              _showBottomSheet(book: book);
-            },
-            child: Card(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(6),
-                child: FutureBuilder(
-                  future: coverImageFuture,
-                  builder: (BuildContext context, AsyncSnapshot snapshot) {
-                    if (snapshot.hasData == false) {
-                      return CoverImage(
-                        coverImage: coverImageDefault,
-                        hasProgressIndicator: true,
-                      );
-                    }
-                    coverImage = Image(image: MemoryImage(snapshot.data));
-                    return CoverImage(coverImage: coverImage);
-                  },
+              // _showBottomSheet(book: book);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => BookInfoScreen(book: book),
                 ),
-              ),
-              elevation: 8,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(6),
-              ),
+              );
+            },
+            child: FutureBuilder(
+              future: coverImageFuture,
+              builder: (BuildContext context, AsyncSnapshot snapshot) {
+                if (snapshot.hasData == false) {
+                  return CoverImage(
+                    coverImage: coverImageDefault,
+                    hasProgressIndicator: true,
+                  );
+                }
+                book.coverImage = MemoryImage(snapshot.data);
+                return Hero(
+                    tag: book.title,
+                    child: CoverImage(coverImage: book.coverImage));
+              },
             ),
           ),
         ),

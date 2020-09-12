@@ -5,15 +5,18 @@ import 'package:meta/meta.dart';
 // Edda Packages
 import 'package:edda/read_book/epub.dart';
 
+import 'package:epub/epub.dart';
+
 class Book {
   final String filePath;
   final String fileType;
-  dynamic handle; // Handle of the epub, cbz, etc.
+  Epub epub; // Handle of the epub, cbz, etc.
   String title = '';
   String author = '';
   String series = '';
   int publicationDate;
-  var coverImage;
+  String description = '';
+  MemoryImage coverImage;
 
   Book({@required this.filePath, @required this.fileType});
 
@@ -31,22 +34,36 @@ class Book {
   /// Return is dynamic because setting specific type caused compute() to throw
   /// TypeError.
   Future getCoverImage() async {
+    var coverImageBytes;
     switch (fileType) {
       case '.epub':
-        await _getEpubCoverImage();
+        coverImageBytes = await _getEpubCoverImage();
     }
-    return coverImage;
+    return coverImageBytes;
   }
 
   _loadEpub() async {
-    handle = Epub(filePath: filePath);
-    await handle.loadEpub();
-    title = handle.title;
-    author = handle.author;
+    epub = Epub(filePath: filePath);
+    await epub.loadEpub();
+    title = epub.title;
+    author = epub.author;
   }
 
   _getEpubCoverImage() async {
-    coverImage = await handle.getCoverImage();
-    return coverImage;
+    var coverImageBytes = await epub.getCoverImage();
+    // Return bytes for compute()
+    return coverImageBytes;
+  }
+
+  getMetadata() {
+    var metadata = epub.epub.Schema.Package.Metadata;
+    description = metadata.Description ?? '';
+    // print(this.description);
+  }
+
+  getEpubChapters() async {
+    List<EpubChapterRef> chapters = await epub.getChapters();
+    var test = await chapters[0].readHtmlContent();
+    print(test);
   }
 }

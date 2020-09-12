@@ -1,5 +1,4 @@
 // Standard Library
-import 'package:edda/read_book/book_screen.dart';
 import 'package:flutter/material.dart';
 
 // Edda Packages

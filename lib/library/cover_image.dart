@@ -6,7 +6,8 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 /// Image Widget for the Cover Tile in the Library.
 class CoverImage extends StatelessWidget {
-  final Image coverImage;
+  /// CoverImage should be an AssetImage, MemoryImage, etc.
+  final dynamic coverImage;
   final bool hasProgressIndicator;
   final dynamic progressIndicator;
 
@@ -21,13 +22,16 @@ class CoverImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
-      aspectRatio: 1 / 1.5,
+      aspectRatio: 1.0 / 1.5,
       child: Container(
         decoration: BoxDecoration(
-            image: DecorationImage(
-          fit: BoxFit.cover,
-          image: coverImage.image,
-        )),
+          image: DecorationImage(
+            fit: BoxFit.cover,
+            image: coverImage,
+          ),
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: kElevationToShadow[8],
+        ),
         child: Center(child: progressIndicator),
       ),
     );

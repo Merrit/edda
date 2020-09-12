@@ -1,6 +1,5 @@
 import 'dart:io';
-import 'package:edda/read_book/book.dart';
-import 'package:path/path.dart' as path;
+
 import 'package:edda/library/cover_tile.dart';
 import 'package:edda/helpers/check_file_type.dart';
 import 'package:edda/settings/settings.dart';
