@@ -97,13 +97,14 @@ class _CoverTileState extends State<CoverTile> {
         Center(
           child: InkWell(
             onTap: () {
-              // _showBottomSheet(book: book);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => BookInfoScreen(book: book),
-                ),
-              );
+              if (book.coverImage != null) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => BookInfoScreen(book: book),
+                  ),
+                );
+              }
             },
             child: FutureBuilder(
               future: coverImageFuture,
