@@ -1,4 +1,5 @@
 import 'package:edda/library/cover_image.dart';
+import 'package:edda/read_book/book_screen.dart';
 import 'package:flutter/material.dart';
 
 import 'package:edda/read_book/book.dart';
@@ -59,11 +60,12 @@ class BookInfoScreen extends StatelessWidget {
                       padding: EdgeInsets.all(20),
                       color: Colors.blue,
                       onPressed: () {
-                        /* var metadata =
-                            book.epub.epub.Schema.Package.Metadata.Description;
-                        print(metadata); */
-                        // book.getMetadata();
-                        print(book.description);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => BookScreen(book: book),
+                          ),
+                        );
                       },
                       child: Text('Read'),
                     )

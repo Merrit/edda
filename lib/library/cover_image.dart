@@ -10,6 +10,8 @@ class CoverImage extends StatelessWidget {
   final dynamic coverImage;
   final bool hasProgressIndicator;
   final dynamic progressIndicator;
+  // TODO: Optional Read progress indicator
+  // final bool showReadProgress;
 
   CoverImage({@required this.coverImage, this.hasProgressIndicator = false})
       : progressIndicator = hasProgressIndicator ? spinkit : null;

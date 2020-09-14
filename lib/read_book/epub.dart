@@ -16,6 +16,7 @@ class Epub {
   String language;
   String publicationDate;
   String description;
+  List<EpubChapterRef> chaptersObjects = [];
 
   Epub({@required this.filePath});
 
@@ -31,7 +32,6 @@ class Epub {
   Future getCoverImage() async {
     Image epubCoverImage = await epub.readCover();
     var coverImage = encodePng(epubCoverImage);
-    // await getChapters();
     return coverImage;
   }
 
@@ -50,7 +50,7 @@ class Epub {
     // For now grab the first and return that.
     if (metadata.Dates.length > 0) {
       publicationDate = metadata.Dates[0].Date;
-      // TODO: This is sometimes returning a date AND time, we only want a time.
+      // TODO: This is sometimes returning a date AND time, we only want a date.
       // Either add parsing to strip the time or submit pull request to epub.
     }
 
@@ -87,6 +87,21 @@ class Epub {
       description = parse(document.body.text).documentElement.text;
       // description = metadata.Description;
     }
+  }
+
+  Future getChapters() async {
+    List<String> chapters = [];
+
+    chaptersObjects = await epub.getChapters();
+    chaptersObjects.forEach((element) async {
+      var chapterHTML =
+          await element.epubTextContentFileRef.readContentAsText();
+      Document intermediateStage = parse(chapterHTML);
+      var chapter = parse(intermediateStage.body.text).documentElement.text;
+      chapters.add(chapter);
+    });
+
+    return chapters;
   }
 }
 
