@@ -16,6 +16,7 @@ class _BookScreenState extends State<BookScreen> {
   Future chapters;
   int currentChapter = 0;
   bool showInterface = true;
+  bool pagedForward = true;
   PageController _pageController;
 
   @override
@@ -31,12 +32,13 @@ class _BookScreenState extends State<BookScreen> {
   }
 
   /// Parse the given chapter into pages for the PageView.
-  String getCurrentPageText(int index, String chapterText) {
+  String getCurrentPageText({int index, String chapterText}) {
     // How many characters fit on the screen.
     // TODO: Find a way to determine this programmatically, including how it
     // changes when the user changes font size.
     int charactersPerPage = 1500;
-    print(index);
+    print('index: $index');
+    print('currentChapter: $currentChapter');
 
     if ((index == 0) && (chapterText.length < charactersPerPage))
       return chapterText;
@@ -58,7 +60,12 @@ class _BookScreenState extends State<BookScreen> {
         ///loaded and another for here, we can do
         ///Future.value(currentChapter+=1) then futurebuilder can say if
         ///snapshot.data == 0 or snapshot.data==1 etc.
-        currentChapter += 1;
+        if (pagedForward) {
+          currentChapter += 1;
+          var newChapter = getCurrentPageText(
+              index: 0, chapterText: book.chapters[currentChapter]);
+          return newChapter;
+        }
         // });
       }
       return "Finished";
@@ -74,7 +81,7 @@ class _BookScreenState extends State<BookScreen> {
           ? AppBar(
               title: GestureDetector(
                 onTap: () {
-                  book.getChapters();
+                  // book.getChapters();
                 },
                 child: Text(book.title),
               ),
@@ -82,7 +89,6 @@ class _BookScreenState extends State<BookScreen> {
           : null,
       body: FutureBuilder(
         future: chapters,
-        // initialData: InitialData,
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (!snapshot.hasData) {
             return Center(child: CircularProgressIndicator());
@@ -93,13 +99,23 @@ class _BookScreenState extends State<BookScreen> {
           return PageView.builder(
             physics: ScrollPhysics(),
             controller: _pageController,
+            onPageChanged: (int page) {
+              // Page variable is the new page and will change before the
+              // _pageController fully reaches the full, rounded int value.
+              // True if the page moved forwards,
+              // false if the page moved backwards.
+              pagedForward = page > _pageController.page;
+              if (!pagedForward && currentChapter > 0) currentChapter -= 1;
+              print(pagedForward);
+            },
             itemBuilder: (context, index) {
               return Center(
                 child: RichText(
                   text: TextSpan(
                       style: TextStyle(fontSize: 25.0, color: Colors.grey[300]),
                       text: getCurrentPageText(
-                          index, book.chapters[currentChapter])),
+                          index: index,
+                          chapterText: book.chapters[currentChapter])),
                   textAlign: TextAlign.start,
                   textScaleFactor: 1.0,
                   textDirection: TextDirection.ltr,
