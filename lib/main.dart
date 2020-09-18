@@ -1,6 +1,6 @@
 // Standard Library
 import 'package:flutter/material.dart';
-import 'package:flutter/gestures.dart';
+// import 'package:flutter/gestures.dart';
 
 // Edda Packages
 import 'package:edda/library/library_screen.dart';
@@ -8,7 +8,7 @@ import 'package:edda/settings/settings_screen.dart';
 import 'package:edda/theme.dart';
 
 void main() {
-  debugPrintGestureArenaDiagnostics = true;
+  // debugPrintGestureArenaDiagnostics = true;
   runApp(MyApp());
 }
 

@@ -1,11 +1,12 @@
 import 'package:meta/meta.dart';
 import 'package:flutter/material.dart';
+import 'dart:io' show Platform;
 
 class Chapter {
   // Depends on screen size & font size.
   // TODO: Find a way to determine this programmatically, including how it
   // changes when the user changes font size.
-  static const int charactersPerPage = 1500;
+  static final int charactersPerPage = Platform.isAndroid ? 500 : 1000;
 
   final String rawText;
   List<Widget> pages = [];
