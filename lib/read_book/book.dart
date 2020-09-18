@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
 // Edda Packages
-import 'package:edda/read_book/epub.dart';
-import 'package:epub/epub.dart';
 import 'package:edda/helpers/capitalize.dart';
+import 'package:edda/read_book/epub.dart';
+import 'package:edda/read_book/chapter.dart';
+
+import 'package:epub/epub.dart';
 
 class Book {
   final String filePath; // Absolute file path
@@ -20,7 +22,7 @@ class Book {
   String language;
   String description;
   MemoryImage coverImage;
-  List chapters = [];
+  List<Chapter> chapters = [];
 
   Book({@required this.filePath, @required this.fileType})
       : fileTypeNice = fileType.replaceAll('.', '').inCaps;
@@ -81,11 +83,21 @@ class Book {
     switch (fileType) {
       case '.epub':
         await _getEpubChapters();
-        return chapters;
+        return Future.value('Complete');
     }
   }
 
-  _getEpubChapters() async {
-    chapters = await epub.getChapters();
+  Future _getEpubChapters() async {
+    List<String> chaptersRaw = await epub.getChapters();
+    if (chaptersRaw.length > 0) {
+      chaptersRaw.forEach((element) {
+        var newChapter = Chapter(rawText: element);
+        chapters.add(newChapter);
+      });
+    } else {
+      chapters.add(Chapter(rawText: 'Error getting chapter'));
+    }
+    // var result = Future.value('Complete');
+    // return result;
   }
 }

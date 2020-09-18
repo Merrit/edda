@@ -93,13 +93,20 @@ class Epub {
     List<String> chapters = [];
 
     chaptersObjects = await epub.getChapters();
-    chaptersObjects.forEach((element) async {
+    await Future.forEach(chaptersObjects, (element) async {
       var chapterHTML =
           await element.epubTextContentFileRef.readContentAsText();
       Document intermediateStage = parse(chapterHTML);
       var chapter = parse(intermediateStage.body.text).documentElement.text;
       chapters.add(chapter);
     });
+    // chaptersObjects.forEach((element) async {
+    //   var chapterHTML =
+    //       await element.epubTextContentFileRef.readContentAsText();
+    //   Document intermediateStage = parse(chapterHTML);
+    //   var chapter = parse(intermediateStage.body.text).documentElement.text;
+    //   chapters.add(chapter);
+    // });
 
     return chapters;
   }

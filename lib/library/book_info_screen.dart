@@ -78,7 +78,7 @@ class BookInfoScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     Text('Author: ${book.author}'),
-                    Text('~Series'),
+                    // Text('~Series'),
                     Text('Publication Date: ${book.publicationDate}'),
                     Text('Genre: ${book.genre}'),
                     Text('Language: ${book.language}'),
