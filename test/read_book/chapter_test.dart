@@ -2,10 +2,10 @@ import 'package:edda/read_book/chapter.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-// These are based on the currently hard-coded charactersPerPage of 1500.
+// These are based on the currently hard-coded charactersPerPage of 1000.
 // They will have to be modified when that is made dynamic.
 
-  int charactersPerPage = 1500;
+  int charactersPerPage = 1000;
 
   group('Create chapter pages: ', () {
     test('Less than 1 page input returns 1 page', () {
@@ -16,7 +16,7 @@ void main() {
 
     test('Empty input returns empty chapter', () {
       var chapter = Chapter(rawText: '');
-      expect(chapter.pages[0], '');
+      expect(chapter.pages[0].pageText, '');
     });
 
     test('More than 1 page & less than 2 pages - returns 2 pages', () {
@@ -26,7 +26,7 @@ void main() {
     });
 
     test('More than 3 pages & less than 4 - returns 4 pages', () {
-      var testText = _wonderland.substring(0, 5000);
+      var testText = _wonderland.substring(0, 3500);
       var chapter = Chapter(rawText: testText);
       expect(chapter.pages.length, 4);
     });
