@@ -1,4 +1,4 @@
-package com.example.reader
+package com.merritt.edda
 
 import io.flutter.embedding.android.FlutterActivity
 

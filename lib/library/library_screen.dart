@@ -1,33 +1,35 @@
 // Standard Library
+import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 
-// Reader Packages
-import 'package:reader/components/cover_tile.dart';
-import 'package:reader/library/find_books.dart';
-import 'package:reader/settings/settings_screen.dart';
+// Edda Packages
+import 'package:edda/library/cover_tile.dart';
+import 'package:edda/library/library.dart';
+import 'package:edda/settings/settings_screen.dart';
 
-class Library extends StatefulWidget {
+class LibraryScreen extends StatefulWidget {
   static final String id = 'library_screen';
 
   @override
-  _LibraryState createState() => _LibraryState();
+  _LibraryScreenState createState() => _LibraryScreenState();
 }
 
-class _LibraryState extends State<Library> {
+class _LibraryScreenState extends State<LibraryScreen> {
   String libraryPath;
   List<CoverTile> bookTiles = [];
-
-  Future<List<CoverTile>> getBookTiles() async {
-    var books = Books();
-    await books.buildBookTiles();
-    bookTiles = books.coverTilesList;
-    return bookTiles;
-  }
+  // TODO: This spacing variable should probably replaced with
+  // a media query or similar.
+  double bookMainAxisSpacing =
+      (Platform.isAndroid || Platform.isIOS) ? 0.0 : 10.0;
 
   @override
   void initState() {
     super.initState();
-    getBookTiles().then((value) => setState(() {
+    _getBookTiles();
+  }
+
+  void _getBookTiles() async {
+    Library.buildBookTiles().then((value) => setState(() {
           bookTiles = value;
         }));
   }
@@ -40,21 +42,22 @@ class _LibraryState extends State<Library> {
         actions: [
           IconButton(
               icon: Icon(Icons.settings),
-              onPressed: () async {
-                Navigator.pushNamed(context, SettingsScreen.id);
-                setState(() {
-                  // This setState is here so it will rebuild the Library with
-                  // the new library path after the settings screen is popped.
-                });
+              onPressed: () {
+                Navigator.pushNamed(context, SettingsScreen.id).then((value) =>
+                    Library.buildBookTiles().then((tilesValue) => setState(() {
+                          bookTiles = tilesValue;
+                        })));
+                // This setState is here so it will rebuild the Library with
+                // the new library path after the settings screen is popped.
               }),
         ],
       ),
       body: Padding(
         padding: EdgeInsets.all(20),
         child: GridView.extent(
-          maxCrossAxisExtent: 200,
-          crossAxisSpacing: 30,
-          mainAxisSpacing: 50.0,
+          maxCrossAxisExtent: 180,
+          crossAxisSpacing: 15,
+          mainAxisSpacing: bookMainAxisSpacing,
           childAspectRatio: 2 / 5,
           children: bookTiles,
         ),
