@@ -23,16 +23,27 @@ class _BookScreenState extends State<BookScreen> {
 
   int currentChapter = 0;
   int currentPage = 0;
+
+  /// Allow us to hide/show the interface elements beyond the page text.
+  ///
+  /// Header bar, settings button, progress bar, back button, etc.
   bool showInterface = true;
 
   /// The controller allows us to instruct PageView to change pages.
+  ///
+  /// Necessary because we use a GestureDetector to handle taps, as well as to
+  /// know when to move chapter forward / backward which loads a new list.
   PageController _pageController;
 
   // TODO: These can't be hardcoded!
+  /// Bools keep track of our position so we know if we need
+  /// to switch chapter, book has finished, etc.
   bool hasReachedChapterStart = true;
   bool hasReachedChapterEnd = false;
   bool hasReachedBookStart;
   bool hasReachedBookEnd = false;
+
+  /// Settings for the page turn animation.
   Duration pageTurnDuration = Duration(milliseconds: 500);
   Curve pageTurnCurve = Curves.linearToEaseOut;
 
@@ -40,14 +51,26 @@ class _BookScreenState extends State<BookScreen> {
   void initState() {
     super.initState();
     book = widget.book;
+    // Instantiate a PageController to manipulate the PageView.
     _pageController = PageController();
+    // Start loading the book text.
     _getChapters();
   }
 
+  /// Load the book text with an async process.
+  ///
+  /// When this completes the FutureBuilder will display the book.
   void _getChapters() {
     chapters = book.getChapters();
   }
 
+  /// Check where we are in the book.
+  ///
+  /// Did we load the first page of the first chapter, but it is only one page?
+  /// We will need to move to next chapter on tap.
+  ///
+  /// If there was a saved reading position, how does that relate to what
+  /// _goForward() or _goBack() will need to do?
   void _checkPosition() {
     // TODO: This will need to be checked for the position if a saved position
     // was loaded from previous instance.
@@ -61,6 +84,10 @@ class _BookScreenState extends State<BookScreen> {
     if (currentChapter == 0 && currentPage == 0) hasReachedBookStart = true;
   }
 
+  /// Allow us to hide/show the interface elements beyond the page text.
+  ///
+  /// Toggled by tapping / clicking the center of the book.
+  /// Header bar, settings button, progress bar, back button, etc.
   void _toggleInterface() {
     setState(() {
       showInterface = !showInterface;
@@ -141,7 +168,7 @@ class _BookScreenState extends State<BookScreen> {
     return AppBar(
       title: GestureDetector(
         onTap: () {
-          print(book.chapters[currentChapter].pages.length);
+          // Debugging
         },
         child: Text(book.title),
       ),

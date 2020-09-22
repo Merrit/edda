@@ -1,6 +1,5 @@
 // Standard Library
 import 'package:flutter/material.dart';
-// import 'package:flutter/gestures.dart';
 
 // Edda Packages
 import 'package:edda/library/library_screen.dart';
@@ -23,6 +22,8 @@ class MyApp extends StatelessWidget {
       routes: {
         LibraryScreen.id: (context) => LibraryScreen(),
         SettingsScreen.id: (context) => SettingsScreen(),
+        // TODO: Passing arguments to a named route seemed
+        // annoying, need to look into it more.
         // BookScreen.id: (context) => BookScreen(),
       },
       initialRoute: LibraryScreen.id,

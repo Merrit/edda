@@ -1,14 +1,22 @@
+// Standard Library
 import 'dart:io';
-
 import 'package:html/dom.dart';
+import 'package:html/parser.dart' show parse;
 import 'package:meta/meta.dart';
+
+// Third Party Packages
 import 'package:epub/epub.dart';
 import 'package:image/image.dart';
-import 'package:html/parser.dart' show parse;
 
+/// A class that represents a single epub book file with
+/// all of its related information and actions.
 class Epub {
+  /// The absolute file path.
   final String filePath;
+
+  /// The handle on the epub after opening it with the epub package.
   EpubBookRef epub;
+
   String title;
   String author;
   String series;
@@ -16,10 +24,12 @@ class Epub {
   String language;
   String publicationDate;
   String description;
+
   List<EpubChapterRef> chaptersObjects = [];
 
   Epub({@required this.filePath});
 
+  /// Loads the epub's basic metadata and a handle for future operations.
   Future<void> loadEpub() async {
     File epubFile = File(filePath);
     List<int> bytes = epubFile.readAsBytesSync();
@@ -35,12 +45,9 @@ class Epub {
     return coverImage;
   }
 
-/*   Future<List<EpubChapterRef>> getChapters() async {
-    List<EpubChapterRef> chapters = await epub.getChapters();
-    var chapter1 = chapters;
-    return chapters;
-  } */
-
+  // TODO: This doesn't seem to load additional information from disk, only
+  // access what was already loaded by loadEpub(). Test if we can just move this
+  // into the inital loadEpub() to simplify and streamline.
   void getMetadata() {
     var metadata = epub.Schema.Package.Metadata;
 
@@ -59,7 +66,8 @@ class Epub {
       genre = metadata.Subjects.join(', ');
       // TODO: Sometimes returns an absurd number of genres.
       // Maybe do something like a for loop that limits to ~5 items, or just
-      // the text widget be expandable.
+      // the text widget be expandable. Or get them all, and the book info
+      // screen can choose to display a certain amount of them.
     }
 
     // Language is specified in various ways, eg: 'en-CA' and 'en' both mean
@@ -85,133 +93,32 @@ class Epub {
       // https://github.com/orthros/dart-epub/pull/75
       Document document = parse(metadata.Description);
       description = parse(document.body.text).documentElement.text;
-      // description = metadata.Description;
     }
   }
 
+  /// Loads ALL of the chapters into memory at once.
+  ///
+  /// For smaller books not a problem, but for larger books this could be slow.
+  /// There was an issue in the epub repo asking about the ability
+  /// to load chapters on demand.
   Future getChapters() async {
+    /// The raw chapter data from the epub.
     List<String> chapters = [];
 
+    /// A custom type from the epub package.
     chaptersObjects = await epub.getChapters();
+
+    /// Extract the data from the custom object type..
     await Future.forEach(chaptersObjects, (element) async {
+      // As HTML..
       var chapterHTML =
           await element.epubTextContentFileRef.readContentAsText();
+      // As string without HTML elements.
       Document intermediateStage = parse(chapterHTML);
       var chapter = parse(intermediateStage.body.text).documentElement.text;
       chapters.add(chapter);
     });
-    // chaptersObjects.forEach((element) async {
-    //   var chapterHTML =
-    //       await element.epubTextContentFileRef.readContentAsText();
-    //   Document intermediateStage = parse(chapterHTML);
-    //   var chapter = parse(intermediateStage.body.text).documentElement.text;
-    //   chapters.add(chapter);
-    // });
 
     return chapters;
   }
 }
-
-/* -------------------------------------------------------------------------- */
-/*                       Self attempt to read epub below                      */
-/* -------------------------------------------------------------------------- */
-
-/* // Standard Library
-import 'dart:convert';
-import 'dart:io';
-import 'package:meta/meta.dart';
-
-// Third Party Packages
-import 'package:archive/archive.dart';
-import 'package:archive/archive_io.dart';
-import 'package:xml/xml.dart';
-import 'package:xml2json/xml2json.dart';
-
-class Epub {
-  final Map<String, dynamic> metadata;
-  final String filePath;
-
-  Epub({@required this.filePath}) : this.metadata = loadEpubFile(filePath);
-}
-
-// XML
-//
-// Tag A tag is a markup construct that begins with < and ends with >.
-//
-// Element An element is a logical document component that either begins with a
-// start-tag and ends with a matching end-tag or consists only of an
-// empty-element tag. The characters between the start-tag and end-tag, if any,
-// are the element's content, and may contain markup, including other elements,
-// which are called child elements. An example is <greeting>Hello,
-// world!</greeting>.
-//
-// Attribute An attribute is a markup construct consisting of a name–value pair
-// that exists within a start-tag. An example is <img src="madonna.jpg"
-// alt="Madonna" />, where the names of the attributes are "src" and "alt", and
-// their values are "madonna.jpg" and "Madonna" respectively.
-
-Map<String, dynamic> loadEpubFile(String filePath) {
-  // Map<String, dynamic> metadata;
-  var bytes;
-  // Read file from disk
-  try {
-    bytes = File(filePath).readAsBytesSync();
-  } catch (e) {
-    print('Error reading file: $e');
-  }
-  // Decode zipped file.
-  // .cbz and .epub should be unencrypted zip files.
-  Archive archive = ZipDecoder().decodeBytes(bytes);
-  // Find & parse container.xml
-  ArchiveFile container = archive.findFile('META-INF/container.xml');
-  XmlDocument containerXml = XmlDocument.parse(utf8.decode(container.content));
-  // Find & parse .opf file.
-  String opfFilePath = findOpf(containerXml);
-  ArchiveFile opfFile = archive.findFile(opfFilePath);
-  XmlDocument opfFileXml = XmlDocument.parse(utf8.decode(opfFile.content));
-  // Populate metadata map from the .opf file.
-  Map<String, dynamic> metadata = parseOpf(opfFileXml);
-  // metadata['title'] = _opfFields['title'];
-  return metadata;
-}
-
-String findOpf(XmlDocument containerXml) {
-  // The 'rootfile' node should point to a single .opf file.
-  // This .opf file should describe the structure of the epub.
-  Iterable<XmlElement> rootFileXml = containerXml.findAllElements('rootfile');
-  String rootFile;
-  // Epub should have only one .opf file.
-  if (rootFileXml.length == 1) {
-    rootFile = rootFileXml.first.getAttribute('full-path');
-  } else {
-    // show error dialog
-  }
-  return rootFile;
-}
-
-Map<String, dynamic> parseOpf(XmlDocument opfFileXml) {
-  Map<String, dynamic> fields = Map();
-  // Get Title
-  Iterable<XmlElement> titleXml = opfFileXml.findAllElements('dc:title');
-  if (titleXml.length == 1) {
-    fields['title'] = titleXml.first.innerText;
-  }
-  // Get Author
-  Iterable<XmlElement> authorXml = opfFileXml.findAllElements('dc:creator');
-  if (titleXml.length == 1) {
-    fields['author'] = authorXml.first.getAttribute('opf:file-as');
-  }
-  // Get Cover
-  var coverXml = opfFileXml.findAllElements('meta');
-  var meta = coverXml.first.getAttribute('content');
-  var cover = opfFileXml.findAllElements('cover');
-  // var test = opfFileXml.findAllElements('item');
-  // var test2 = test.firstWhere((element) => element.attributes.contains(meta));
-  print(cover);
-  // cover.forEach((element) {
-  //   if (element.name.toString() == 'item' && element.)
-  // });
-
-  return fields;
-}
- */

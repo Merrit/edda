@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// A widget holding the text to display in the PageView.
 class PageText extends StatelessWidget {
   final String pageText;
 
