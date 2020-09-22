@@ -1,6 +1,8 @@
 import 'package:edda/read_book/book.dart';
 import 'package:flutter/material.dart';
 
+import 'package:edda/read_book/ui/components/tap_detector.dart';
+
 class BookScreen extends StatefulWidget {
   static final String id = 'book_screen';
   final Book book;
@@ -12,17 +14,27 @@ class BookScreen extends StatefulWidget {
 }
 
 class _BookScreenState extends State<BookScreen> {
+  /// The book object with all its information and actions.
   Book book;
+
+  // TODO: Currently this is only used to let us know the chapters are
+  // available so the FutureBuilder can proceed. Better way?
   Future chapters;
+
   int currentChapter = 0;
   int currentPage = 0;
   bool showInterface = true;
+
+  /// The controller allows us to instruct PageView to change pages.
   PageController _pageController;
+
   // TODO: These can't be hardcoded!
   bool hasReachedChapterStart = true;
   bool hasReachedChapterEnd = false;
-  Duration pageTurnDuration = Duration(milliseconds: 100);
-  Curve pageTurnCurve = Curves.ease;
+  bool hasReachedBookStart;
+  bool hasReachedBookEnd = false;
+  Duration pageTurnDuration = Duration(milliseconds: 500);
+  Curve pageTurnCurve = Curves.linearToEaseOut;
 
   @override
   void initState() {
@@ -42,6 +54,11 @@ class _BookScreenState extends State<BookScreen> {
     if (book.chapters[currentChapter].pages.length == 1) {
       hasReachedChapterEnd = true;
     }
+    if (book.chapters.length == 1 && hasReachedChapterEnd) {
+      hasReachedBookEnd = true;
+    }
+
+    if (currentChapter == 0 && currentPage == 0) hasReachedBookStart = true;
   }
 
   void _toggleInterface() {
@@ -52,16 +69,23 @@ class _BookScreenState extends State<BookScreen> {
 
   /// Page forwards.
   void _goForward() {
-    // TODO: Add end of book check
     if (hasReachedChapterEnd) {
-      hasReachedChapterEnd = false;
-      hasReachedChapterStart = true;
-      currentPage = 0;
-      _pageController.jumpToPage(0);
-      setState(() {
-        currentChapter++;
-      });
+      // Check for the end of the book.
+      if (hasReachedBookEnd) {
+        // Do not move forward.
+        // TODO: Perhaps add a custom finished book page?
+      } else {
+        // Switch to first page of next chapter.
+        hasReachedChapterEnd = false;
+        hasReachedChapterStart = true;
+        currentPage = 0; // We want page 0 of the next chapter.
+        _pageController.jumpToPage(0);
+        setState(() {
+          currentChapter++;
+        });
+      }
     } else {
+      // Move forwards one page.
       _pageController.nextPage(
           duration: pageTurnDuration, curve: pageTurnCurve);
       currentPage++;
@@ -71,15 +95,21 @@ class _BookScreenState extends State<BookScreen> {
   /// Page backwards.
   void _goBack() {
     if (hasReachedChapterStart) {
-      hasReachedChapterStart = false;
-      hasReachedChapterEnd = true;
-      var previousChapter = currentChapter - 1;
-      currentPage = book.chapters[previousChapter].pages.length;
-      _pageController.jumpToPage(currentPage);
-      setState(() {
-        currentChapter--;
-      });
+      if (hasReachedBookStart) {
+        // Do not try to move beyond the start of the book.
+      } else {
+        // Move to last page of previous chapter.
+        hasReachedChapterStart = false;
+        hasReachedChapterEnd = true;
+        var previousChapter = currentChapter - 1;
+        currentPage = book.chapters[previousChapter].pages.length;
+        _pageController.jumpToPage(currentPage);
+        setState(() {
+          currentChapter--;
+        });
+      }
     } else {
+      // Move one page backwards.
       _pageController.previousPage(
           duration: pageTurnDuration, curve: pageTurnCurve);
       currentPage--;
@@ -89,7 +119,7 @@ class _BookScreenState extends State<BookScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: showInterface ? AppBar(title: Text(book.title)) : null,
+      appBar: showInterface ? _buildAppBar() : null,
       body: FutureBuilder(
         // Once the chapters are loaded from disk we can display our content.
         future: chapters,
@@ -107,59 +137,78 @@ class _BookScreenState extends State<BookScreen> {
     );
   }
 
-  Container bookPageView() {
-    return Container(
-      // Stack the GestureDetectors on top of the pages.
-      child: Stack(
-        children: [
-          // GestureDetector works better than the built-in PageView
-          // gestures because we know when a swipe was attempted at the
-          // beginning and / or end of a chapter, so we can switch out to a
-          // new chapter.
-          GestureDetector(
-            onHorizontalDragEnd: (dragEndDetails) {
-              // Use on___DragEnd so we only get one event per swipe.
-              if (dragEndDetails.primaryVelocity < 0) {
-                _goForward();
-              } else if (dragEndDetails.primaryVelocity > 0) {
-                _goBack();
-              }
-            },
-            // Padding so the text doesn't hit right against the screen
-            // edges. In books this would be considered the "margin".
-            // TODO: Make this padding a configurable setting.
-            child: Padding(
-              padding: const EdgeInsets.all(2.0),
-              child: PageView(
-                controller: _pageController,
-                children: book.chapters[currentChapter].pages,
-                // Disable PageView gestures.
-                physics: NeverScrollableScrollPhysics(),
-                onPageChanged: (index) {
-                  if (index + 1 == book.chapters[currentChapter].pages.length) {
-                    hasReachedChapterEnd = true;
-                  } else if (index == 0) {
-                    hasReachedChapterStart = true;
-                  } else {
-                    hasReachedChapterStart = false;
-                    hasReachedChapterEnd = false;
-                  }
-                },
+  AppBar _buildAppBar() {
+    return AppBar(
+      title: GestureDetector(
+        onTap: () {
+          print(book.chapters[currentChapter].pages.length);
+        },
+        child: Text(book.title),
+      ),
+    );
+  }
+
+  Widget bookPageView() {
+    return SafeArea(
+      child: Container(
+        // Stack the GestureDetectors on top of the pages.
+        child: Stack(
+          children: [
+            // GestureDetector works better than the built-in PageView
+            // gestures because we know when a swipe was attempted at the
+            // beginning and / or end of a chapter, so we can switch out to a
+            // new chapter.
+            GestureDetector(
+              onHorizontalDragEnd: (dragEndDetails) {
+                // Use on___DragEnd so we only get one event per swipe.
+                if (dragEndDetails.primaryVelocity < 0) {
+                  _goForward();
+                } else if (dragEndDetails.primaryVelocity > 0) {
+                  _goBack();
+                }
+              },
+              // Padding so the text doesn't hit right against the screen
+              // edges. In books this would be considered the "margin".
+              // TODO: Make this padding a configurable setting.
+              child: Padding(
+                padding: const EdgeInsets.all(2.0),
+                child: PageView(
+                  controller: _pageController,
+                  children: book.chapters[currentChapter].pages,
+                  // Disable PageView gestures.
+                  physics: NeverScrollableScrollPhysics(),
+                  // Set bools so we know when to change the chapter.
+                  onPageChanged: (index) {
+                    // TODO: Check for book start/end
+                    if (index + 1 ==
+                        book.chapters[currentChapter].pages.length) {
+                      hasReachedChapterEnd = true;
+                      if (currentChapter + 1 == book.chapters.length) {
+                        hasReachedBookEnd = true;
+                      }
+                    } else if (index == 0) {
+                      hasReachedChapterStart = true;
+                    } else {
+                      hasReachedChapterStart = false;
+                      hasReachedChapterEnd = false;
+                    }
+                  },
+                ),
               ),
             ),
-          ),
-          // GestureDetectors for Back, Toggle Interface, and Forward taps.
-          Row(
-            children: [
-              // Detect left-side tap
-              TapDetector(flexAmount: 1, tapCallback: _goBack),
-              // Detect center tap
-              TapDetector(flexAmount: 1, tapCallback: _toggleInterface),
-              // Detect right-side tap
-              TapDetector(flexAmount: 1, tapCallback: _goForward),
-            ],
-          ),
-        ],
+            Row(
+              // GestureDetectors for Back, Toggle Interface, and Forward taps.
+              children: [
+                // Detect left-side tap
+                TapDetector(flexAmount: 1, tapCallback: _goBack),
+                // Detect center tap
+                TapDetector(flexAmount: 1, tapCallback: _toggleInterface),
+                // Detect right-side tap
+                TapDetector(flexAmount: 1, tapCallback: _goForward),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -168,38 +217,5 @@ class _BookScreenState extends State<BookScreen> {
   void dispose() {
     _pageController.dispose();
     super.dispose();
-  }
-}
-
-/// A widget that is transparent and contains
-/// a gesture detector and flex properties.
-class TapDetector extends StatelessWidget {
-  /// What gets done after a tap event.
-  final Function tapCallback;
-
-  /// If there is no Flex amount it will cause errors if under a Column / Row.
-  final int flexAmount;
-
-  /// The container background color (optional). Example:
-  /// ```dart
-  /// Colors.lightGreen.withOpacity(0.3)
-  /// ```
-  /// would give a semi-transparent color so you can position the [TapDetector].
-  final color;
-
-  const TapDetector({@required this.flexAmount, this.tapCallback, this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Flexible(
-      flex: flexAmount,
-      child: Container(
-        color: color,
-        child: GestureDetector(
-          behavior: HitTestBehavior.translucent,
-          onTap: tapCallback,
-        ),
-      ),
-    );
   }
 }

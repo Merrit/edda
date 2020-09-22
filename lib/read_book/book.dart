@@ -4,29 +4,62 @@ import 'package:meta/meta.dart';
 
 // Edda Packages
 import 'package:edda/helpers/capitalize.dart';
-import 'package:edda/read_book/epub.dart';
 import 'package:edda/read_book/chapter.dart';
+import 'package:edda/read_book/epub.dart';
 
+// Third Party Packages
+// ignore: unused_import
 import 'package:epub/epub.dart';
 
+/// A class that represents all of the information and actions for a single book.
 class Book {
-  final String filePath; // Absolute file path
-  final String fileType; // File type, eg: .epub
-  String fileTypeNice; // File type with Capital letter and no '.', eg: Epub
-  Epub epub; // Handle of an epub file.
+  /// The absolute file path.
+  final String filePath;
+
+  /// The file type, eg: .epub, .cbz, .pdf, etc.
+  final String fileType;
+
+  /// The file type in human-readable format, eg: Epub, CBZ, PDF, etc.
+  String fileTypeNice;
+
+  /// The handle of an epub file. Allows us to invoke further actions.
+  Epub epub;
+
+  /// The title of the book.
   String title;
+
+  /// The author(s) of the book.
   String author;
-  String series = '';
+
+  /// The book series and its number in the series. TODO: Add this.
+  String series;
+
+  /// The date the book was published.
+  /// Format is year-month-day, for example: 1979-10-12.
   String publicationDate;
+
+  /// The genre(s) the book belongs to.
   String genre;
+
+  // TODO: Should this be English? Native better? Eg, German vs Deutsch?
+  /// The language this book is in.
   String language;
+
+  /// The short description of the book.
   String description;
+
+  // TODO: The cover currently gets pulled every time. See if it
+  // can be cached so that subsequent loads are faster.
+  /// The cover image from the book.
   MemoryImage coverImage;
+
+  /// The chapters of the book as widgets that get passed to the PageView.
   List<Chapter> chapters = [];
 
   Book({@required this.filePath, @required this.fileType})
       : fileTypeNice = fileType.replaceAll('.', '').inCaps;
 
+  /// Load basic book metadata and handle.
   Future<void> loadBook() async {
     switch (fileType) {
       case '.epub':
@@ -34,6 +67,7 @@ class Book {
     }
   }
 
+  /// Load basic epub metadata and handle.
   _loadEpub() async {
     epub = Epub(filePath: filePath);
     await epub.loadEpub();
@@ -41,7 +75,9 @@ class Book {
     author = epub.author ?? '-';
   }
 
-  /// Get cover image depending on file type.
+  // TODO: Can we use isolate instead of compute? Would it be better?
+  //
+  /// Gets the cover image depending on book type.
   ///
   /// Return is a List<int> because that is what compute() can handle.
   ///
@@ -79,6 +115,10 @@ class Book {
     description = epub.description ?? '-';
   }
 
+  /// Load chapter text into memory.
+  ///
+  /// This would be better if it could load chapters on demand rather
+  /// than all at once.
   Future getChapters() async {
     switch (fileType) {
       case '.epub':
@@ -87,6 +127,10 @@ class Book {
     }
   }
 
+  /// Load epub chapter text into memory.
+  ///
+  /// Currently loads all chapters at once.
+  /// Issue on repo to add ability to load on demand instead.
   Future _getEpubChapters() async {
     List<String> chaptersRaw = await epub.getChapters();
     if (chaptersRaw.length > 0) {
@@ -97,7 +141,5 @@ class Book {
     } else {
       chapters.add(Chapter(rawText: 'Error getting chapter'));
     }
-    // var result = Future.value('Complete');
-    // return result;
   }
 }
